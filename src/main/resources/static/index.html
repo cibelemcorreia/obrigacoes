@@ -1,0 +1,110 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Obrigacoes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <main class="page">
+        <section class="hero">
+            <p class="eyebrow">Painel de Controle</p>
+            <h1>Obrigações</h1>
+            <p class="subtitle">Controle prazos de declarações, apurações e rotinas com organização centralizada.</p>
+        </section>
+
+        <section class="card form-card">
+            <h2>Cadastrar obrigação</h2>
+            <form id="form-obrigacao" class="form-grid">
+                <input type="hidden" id="obrigacaoId">
+                <label class="field">
+                    <span>Nome</span>
+                    <input type="text" id="nome" placeholder="Ex.: EFD-Contribuições" required>
+                </label>
+
+                <label class="field">
+                    <span>Departamento</span>
+                    <select id="departamento" required>
+                        <option value="CONTABIL">Contábil</option>
+                        <option value="FISCAL">Fiscal</option>
+                        <option value="PESSOAL">Pessoal</option>
+                    </select>
+                </label>
+
+                <label class="field">
+                    <span>Periodicidade</span>
+                    <select id="periodicidade" required>
+                        <option value="MENSAL">Mensal</option>
+                        <option value="ANUAL">Anual</option>
+                    </select>
+                </label>
+
+                <label class="field">
+                    <span>Tipo de prazo</span>
+                    <select id="tipoPrazo" required>
+                        <option value="DIA_FIXO">Dia fixo</option>
+                        <option value="DIA_UTIL">N dia útil</option>
+                        <option value="ULTIMO_DIA_UTIL">Último dia útil</option>
+                    </select>
+                </label>
+
+                <label class="field" id="campo-dia-limite">
+                    <span>Dia</span>
+                    <input type="number" id="diaLimite" min="1" max="31" step="1" required>
+                </label>
+
+                <label class="field" id="campo-dia-util">
+                    <span>Número do dia útil</span>
+                    <input type="number" id="numeroDiaUtil" min="1" max="23" step="1">
+                </label>
+
+                <label class="field" id="campo-mes-limite">
+                    <span>Mês</span>
+                    <input type="number" id="mesLimite" min="1" max="12" step="1" required>
+                </label>
+
+                <div class="form-actions">
+                    <button type="submit" id="btn-submit">Salvar</button>
+                    <button type="button" id="btn-cancelar-edicao" class="secondary hidden">Cancelar</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="card table-card">
+            <div class="section-title">
+                <h2>Obrigações cadastradas</h2>
+                <span id="contador-obrigacoes" class="counter">0 registros</span>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Departamento</th>
+                            <th>Periodicidade</th>
+                            <th>Prazo</th>
+                            <th>Mês</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-obrigacoes"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="/js/script.js" defer></script>
+</body>
+
+</html>
