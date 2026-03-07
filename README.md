@@ -120,10 +120,9 @@ O projeto utiliza:
 - **PostgreSQL**
 - Executado via **Docker Compose**
 
-Ferramentas úteis para acessar o banco:
+Ferramenta útil para acessar o banco:
 
 - DBeaver
-- pgAdmin
 
 ---
 
