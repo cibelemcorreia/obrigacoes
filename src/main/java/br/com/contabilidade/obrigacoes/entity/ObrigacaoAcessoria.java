@@ -1,4 +1,4 @@
-﻿package br.com.contabilidade.obrigacoes.entity;
+package br.com.contabilidade.obrigacoes.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

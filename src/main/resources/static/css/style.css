@@ -1,4 +1,4 @@
-:root {
+﻿:root {
     --bg-top: #f3f6fa;
     --bg-mid: #edf2f7;
     --bg-bottom: #e4ebf3;
@@ -48,8 +48,7 @@ body {
     overflow: hidden;
     border-radius: 22px;
     padding: 24px 26px;
-    background:
-        linear-gradient(140deg, rgba(255, 255, 255, 0.96), rgba(246, 250, 255, 0.9));
+    background: linear-gradient(140deg, rgba(255, 255, 255, 0.96), rgba(246, 250, 255, 0.9));
     border: 1px solid rgba(225, 232, 241, 0.95);
     box-shadow: var(--card-shadow);
     animation: reveal-up 0.55s ease both;
@@ -105,23 +104,29 @@ h1 {
 }
 
 .form-card {
-    animation-delay: 0.05s;
+    animation-delay: 0.04s;
 }
 
 .table-card {
-    animation-delay: 0.1s;
-}
-
-.form-card h2,
-.table-card h2 {
-    font-size: 1.28rem;
-    margin-bottom: 16px;
+    animation-delay: 0.08s;
 }
 
 .form-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
+}
+
+.filter-row {
+    margin: 18px 0 16px;
+    max-width: 320px;
+}
+
+.table-filters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 260px));
+    gap: 14px;
+    margin-bottom: 16px;
 }
 
 .field {
@@ -204,6 +209,43 @@ button:active {
     flex: 1 1 220px;
 }
 
+.table-filter-actions {
+    margin-top: 0;
+    margin-bottom: 16px;
+    justify-content: flex-end;
+}
+
+.table-filter-actions button {
+    flex: 0 0 auto;
+}
+
+.text-action-btn {
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--primary-strong);
+    background: rgba(31, 79, 122, 0.08);
+    border: 1px solid rgba(31, 79, 122, 0.16);
+    box-shadow: none;
+}
+
+.text-action-btn:hover {
+    box-shadow: none;
+    background: rgba(31, 79, 122, 0.14);
+    filter: none;
+}
+
+.text-action-btn.secondary {
+    color: #5f6b7d;
+    background: rgba(109, 117, 135, 0.08);
+    border-color: rgba(109, 117, 135, 0.16);
+}
+
+.text-action-btn.secondary:hover {
+    background: rgba(109, 117, 135, 0.14);
+}
+
 button.secondary {
     background: linear-gradient(140deg, #6d7587, #838ea3);
 }
@@ -244,7 +286,7 @@ table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    min-width: 760px;
+    min-width: 1120px;
 }
 
 thead {
@@ -281,6 +323,25 @@ tbody tr:hover {
     background: #ecf3fb;
 }
 
+.empty-state {
+    text-align: center;
+    color: var(--muted);
+    font-weight: 600;
+    padding: 22px 14px;
+}
+
+tbody tr.row-near-due {
+    background: #fff6e7;
+}
+
+tbody tr.row-overdue {
+    background: #fdecec;
+}
+
+tbody tr.row-delivered {
+    background: #edf9f3;
+}
+
 td:last-child,
 th:last-child {
     min-width: 170px;
@@ -290,6 +351,55 @@ th:last-child {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+}
+
+.status-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.status-chip.is-pending {
+    background: rgba(191, 126, 16, 0.12);
+    color: #8f5d09;
+}
+
+.status-chip.is-delivered {
+    background: rgba(16, 131, 95, 0.12);
+    color: #0f7355;
+}
+
+.due-cell {
+    display: grid;
+    gap: 6px;
+}
+
+.due-badge {
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 700;
+}
+
+.due-badge.near {
+    background: rgba(191, 126, 16, 0.14);
+    color: #8f5d09;
+}
+
+.due-badge.overdue {
+    background: rgba(182, 55, 67, 0.14);
+    color: #9a2430;
+}
+
+.field-emphasis input {
+    border-color: rgba(16, 131, 95, 0.45);
+    box-shadow: 0 0 0 3px rgba(16, 131, 95, 0.08);
 }
 
 .table-action-btn {
@@ -341,7 +451,8 @@ th:last-child {
         border-radius: 16px;
     }
 
-    .form-grid {
+    .form-grid,
+    .table-filters {
         grid-template-columns: 1fr;
     }
 
@@ -350,7 +461,7 @@ th:last-child {
     }
 
     table {
-        min-width: 680px;
+        min-width: 980px;
     }
 }
 

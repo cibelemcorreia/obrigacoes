@@ -23,7 +23,10 @@
         </section>
 
         <section class="card form-card">
-            <h2>Cadastrar obrigação</h2>
+            <div class="section-title">
+                <h2>Cadastro de obrigações</h2>
+                <span id="contador-obrigacoes" class="counter">0 registros</span>
+            </div>
             <form id="form-obrigacao" class="form-grid">
                 <input type="hidden" id="obrigacaoId">
                 <label class="field">
@@ -77,13 +80,6 @@
                     <button type="button" id="btn-cancelar-edicao" class="secondary hidden">Cancelar</button>
                 </div>
             </form>
-        </section>
-
-        <section class="card table-card">
-            <div class="section-title">
-                <h2>Obrigações cadastradas</h2>
-                <span id="contador-obrigacoes" class="counter">0 registros</span>
-            </div>
 
             <div class="table-wrapper">
                 <table>
@@ -99,6 +95,91 @@
                         </tr>
                     </thead>
                     <tbody id="tabela-obrigacoes"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card table-card">
+            <div class="section-title">
+                <h2>Cadastro de empresas</h2>
+                <span id="contador-empresas" class="counter">0 registros</span>
+            </div>
+
+            <form id="form-empresa" class="form-grid">
+                <input type="hidden" id="empresaId">
+                <label class="field">
+                    <span>Nome da empresa</span>
+                    <input type="text" id="empresaNome" placeholder="Ex.: Alpha Contabilidade Ltda" required>
+                </label>
+
+                <label class="field">
+                    <span>CNPJ</span>
+                    <input type="text" id="empresaCnpj" placeholder="00.000.000/0000-00" required>
+                </label>
+
+                <div class="form-actions">
+                    <button type="submit" id="btn-submit-empresa">Salvar empresa</button>
+                    <button type="button" id="btn-cancelar-empresa" class="secondary hidden">Cancelar</button>
+                </div>
+            </form>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>CNPJ</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-empresas"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card table-card">
+            <div class="section-title">
+                <h2>Vincular obrigações</h2>
+                <span id="contador-vinculos" class="counter">0 registros</span>
+            </div>
+
+            <form id="form-vinculo" class="form-grid">
+                <label class="field">
+                    <span>Empresa</span>
+                    <select id="vinculoEmpresaId" required></select>
+                </label>
+
+                <label class="field">
+                    <span>Obrigação</span>
+                    <select id="vinculoObrigacaoId" required></select>
+                </label>
+
+                <div class="form-actions">
+                    <button type="submit" id="btn-submit-vinculo">Vincular</button>
+                </div>
+            </form>
+
+            <div class="filter-row">
+                <label class="field">
+                    <span>Filtrar por empresa</span>
+                    <select id="filtroEmpresaVinculo"></select>
+                </label>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Empresa</th>
+                            <th>CNPJ</th>
+                            <th>Obrigação</th>
+                            <th>Departamento</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-vinculos"></tbody>
                 </table>
             </div>
         </section>

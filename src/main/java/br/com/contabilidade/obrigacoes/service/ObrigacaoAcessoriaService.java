@@ -1,9 +1,10 @@
-﻿package br.com.contabilidade.obrigacoes.service;
+package br.com.contabilidade.obrigacoes.service;
 
 import br.com.contabilidade.obrigacoes.entity.ObrigacaoAcessoria;
 import br.com.contabilidade.obrigacoes.entity.Periodicidade;
 import br.com.contabilidade.obrigacoes.entity.TipoPrazo;
 import br.com.contabilidade.obrigacoes.exception.NotFoundException;
+import br.com.contabilidade.obrigacoes.repository.EmpresaObrigacaoRepository;
 import br.com.contabilidade.obrigacoes.repository.ObrigacaoAcessoriaRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,9 +14,12 @@ import java.util.List;
 public class ObrigacaoAcessoriaService {
 
     private final ObrigacaoAcessoriaRepository repository;
+    private final EmpresaObrigacaoRepository empresaObrigacaoRepository;
 
-    public ObrigacaoAcessoriaService(ObrigacaoAcessoriaRepository repository) {
+    public ObrigacaoAcessoriaService(ObrigacaoAcessoriaRepository repository,
+                                     EmpresaObrigacaoRepository empresaObrigacaoRepository) {
         this.repository = repository;
+        this.empresaObrigacaoRepository = empresaObrigacaoRepository;
     }
 
     public List<ObrigacaoAcessoria> listarTodas() {
@@ -45,6 +49,10 @@ public class ObrigacaoAcessoriaService {
     public void excluir(Long id) {
         if (!repository.existsById(id)) {
             throw new NotFoundException("Obrigação não encontrada para o id informado");
+        }
+
+        if (empresaObrigacaoRepository.existsByObrigacaoId(id)) {
+            throw new IllegalArgumentException("Não é possível excluir uma obrigação vinculada a empresas");
         }
 
         repository.deleteById(id);
