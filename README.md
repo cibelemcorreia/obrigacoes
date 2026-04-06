@@ -58,6 +58,8 @@ http://localhost:8080
 
 # 📖 Endpoints da API
 
+### Obrigações
+
 Base path:
 
 ```
@@ -110,6 +112,76 @@ DELETE /api/obrigacoes/{id}
 
 - Para `tipoPrazo = ULTIMO_DIA_UTIL`, o sistema exige apenas `mesLimite` (1 a 12).
 - Nesse caso, `diaLimite` e `numeroDiaUtil` são ignorados e a periodicidade é tratada como `ANUAL`.
+
+### Empresas
+
+Base path:
+
+```
+/api/empresas
+```
+
+### Listar empresas
+
+```
+GET /api/empresas
+```
+
+### Buscar empresa por ID
+
+```
+GET /api/empresas/{id}
+```
+
+### Criar empresa
+
+```
+POST /api/empresas
+```
+
+### Atualizar empresa
+
+```
+PUT /api/empresas/{id}
+```
+
+### Excluir empresa
+
+```
+DELETE /api/empresas/{id}
+```
+
+### Vínculo empresa x obrigação
+
+Base path:
+
+```
+/api/empresa-obrigacoes
+```
+
+### Listar vínculos
+
+```
+GET /api/empresa-obrigacoes
+```
+
+### Listar vínculos por empresa
+
+```
+GET /api/empresa-obrigacoes?empresaId=1
+```
+
+### Criar vínculo
+
+```
+POST /api/empresa-obrigacoes
+```
+
+### Excluir vínculo
+
+```
+DELETE /api/empresa-obrigacoes/{id}
+```
 
 ---
 
