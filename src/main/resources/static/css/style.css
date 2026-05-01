@@ -1279,6 +1279,13 @@ th {
     white-space: nowrap;
 }
 
+.table-entregas .table-action-muted {
+    padding: 6px 10px;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
 tbody tr {
     background: rgba(255, 255, 255, 0.98);
 }

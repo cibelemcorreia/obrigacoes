@@ -216,69 +216,12 @@
                     </div>
                 </section>
 
-                <section class="card card-panel table-card accent-card">
-                    <div class="section-title">
-                        <div>
-                            <h2>Controlar entregas</h2>
-                        </div>
-                        <span id="contador-entregas" class="counter">0 registros</span>
-                    </div>
-                    <details id="painel-entrega" class="details-panel details-panel-strong">
-                        <summary class="details-summary">
-                            <span class="details-title">Detalhes da entrega</span>
-                            <span class="details-meta">Abra para lançar ou editar controles</span>
-                        </summary>
-                        <div class="details-body">
-                            <div class="control-shell">
-                                <form id="form-entrega" class="form-grid form-grid-delivery">
-                                    <label class="field">
-                                        <span>Empresa</span>
-                                        <select id="entregaEmpresaId" required></select>
-                                    </label>
-
-                                    <label class="field">
-                                        <span>Obrigação vinculada</span>
-                                        <select id="entregaEmpresaObrigacaoId" required></select>
-                                    </label>
-
-                                    <label class="field" id="campo-entrega-competencia-mes">
-                                        <span>Competência</span>
-                                        <input type="month" id="entregaCompetencia" required>
-                                    </label>
-
-                                    <label class="field hidden" id="campo-entrega-competencia-ano">
-                                        <span>Ano de referência</span>
-                                        <input type="number" id="entregaAnoCompetencia" min="2000" max="9999" step="1">
-                                    </label>
-
-                                    <label class="field">
-                                        <span>Status</span>
-                                        <select id="entregaStatus" required>
-                                            <option value="PENDENTE">Pendente</option>
-                                            <option value="ENTREGUE">Entregue</option>
-                                        </select>
-                                    </label>
-
-                                    <label class="field hidden" id="campo-data-entrega">
-                                        <span>Data da entrega</span>
-                                        <input type="date" id="entregaDataEntrega">
-                                    </label>
-
-                                    <div class="form-actions">
-                                        <button type="submit" id="btn-submit-entrega">Salvar controle</button>
-                                        <button type="button" id="btn-cancelar-entrega" class="secondary hidden">Cancelar</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </details>
-                </section>
-
                 <section class="card card-panel table-card filters-card">
                     <div class="section-title">
                         <div>
-                            <h2>Filtros</h2>
+                            <h2>Controle</h2>
                         </div>
+                        <span id="contador-entregas" class="counter">0 registros</span>
                     </div>
 
                     <div class="filters-shell standalone">

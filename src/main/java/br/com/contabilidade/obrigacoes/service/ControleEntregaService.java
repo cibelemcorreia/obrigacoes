@@ -4,6 +4,7 @@ import br.com.contabilidade.obrigacoes.dto.ControleEntregaRequest;
 import br.com.contabilidade.obrigacoes.dto.ControleEntregaResponse;
 import br.com.contabilidade.obrigacoes.entity.ControleEntrega;
 import br.com.contabilidade.obrigacoes.entity.EmpresaObrigacao;
+import br.com.contabilidade.obrigacoes.entity.Periodicidade;
 import br.com.contabilidade.obrigacoes.entity.StatusEntrega;
 import br.com.contabilidade.obrigacoes.exception.NotFoundException;
 import br.com.contabilidade.obrigacoes.repository.ControleEntregaRepository;
@@ -29,7 +30,7 @@ public class ControleEntregaService {
                                                 LocalDate competencia,
                                                 String departamento,
                                                 StatusEntrega status) {
-        LocalDate competenciaNormalizada = normalizarCompetencia(competencia);
+        LocalDate competenciaNormalizada = normalizarCompetenciaFiltro(competencia);
         String departamentoNormalizado = normalizarDepartamento(departamento);
         return repository.findAllByOrderByCompetenciaDescEmpresaObrigacaoEmpresaNomeAscEmpresaObrigacaoObrigacaoNomeAsc()
                 .stream()
@@ -44,11 +45,16 @@ public class ControleEntregaService {
                 .toList();
     }
 
+    private LocalDate normalizarCompetenciaFiltro(LocalDate competencia) {
+        return competencia == null ? null : competencia.withDayOfMonth(1);
+    }
+
     public ControleEntregaResponse salvar(ControleEntregaRequest request) {
         EmpresaObrigacao empresaObrigacao = empresaObrigacaoRepository.findById(request.empresaObrigacaoId())
                 .orElseThrow(() -> new NotFoundException("Vínculo não encontrado para o id informado"));
 
-        LocalDate competencia = normalizarCompetencia(request.competencia());
+        Periodicidade periodicidade = empresaObrigacao.getObrigacao().getPeriodicidade();
+        LocalDate competencia = normalizarCompetencia(request.competencia(), periodicidade);
         ControleEntrega controle = repository.findByEmpresaObrigacaoIdAndCompetencia(empresaObrigacao.getId(), competencia)
                 .orElseGet(ControleEntrega::new);
 
@@ -58,7 +64,13 @@ public class ControleEntregaService {
         controle.setDataEntrega(normalizarDataEntrega(request.status(), request.dataEntrega()));
 
         validarDatas(controle);
-        return toResponse(repository.save(controle));
+        ControleEntrega salvo = repository.save(controle);
+
+        if (salvo.getStatus() == StatusEntrega.ENTREGUE) {
+            garantirProximoControlePendente(empresaObrigacao, salvo.getCompetencia(), periodicidade);
+        }
+
+        return toResponse(salvo);
     }
 
     public void excluir(Long id) {
@@ -69,8 +81,14 @@ public class ControleEntregaService {
         repository.deleteById(id);
     }
 
-    private LocalDate normalizarCompetencia(LocalDate competencia) {
-        return competencia == null ? null : competencia.withDayOfMonth(1);
+    private LocalDate normalizarCompetencia(LocalDate competencia, Periodicidade periodicidade) {
+        if (competencia == null) {
+            return null;
+        }
+
+        return periodicidade == Periodicidade.ANUAL
+                ? competencia.withDayOfYear(1)
+                : competencia.withDayOfMonth(1);
     }
 
     private String normalizarDepartamento(String departamento) {
@@ -93,6 +111,32 @@ public class ControleEntregaService {
         if (controle.getStatus() == StatusEntrega.ENTREGUE && controle.getDataEntrega() == null) {
             throw new IllegalArgumentException("A data de entrega deve ser informada para status entregue");
         }
+    }
+
+    private void garantirProximoControlePendente(EmpresaObrigacao empresaObrigacao,
+                                                 LocalDate competenciaAtual,
+                                                 Periodicidade periodicidade) {
+        LocalDate proximaCompetencia = calcularProximaCompetencia(competenciaAtual, periodicidade);
+        boolean jaExiste = repository.findByEmpresaObrigacaoIdAndCompetencia(empresaObrigacao.getId(), proximaCompetencia)
+                .isPresent();
+        if (jaExiste) {
+            return;
+        }
+
+        ControleEntrega proximoControle = new ControleEntrega();
+        proximoControle.setEmpresaObrigacao(empresaObrigacao);
+        proximoControle.setCompetencia(proximaCompetencia);
+        proximoControle.setStatus(StatusEntrega.PENDENTE);
+        proximoControle.setDataEntrega(null);
+        repository.save(proximoControle);
+    }
+
+    private LocalDate calcularProximaCompetencia(LocalDate competenciaAtual, Periodicidade periodicidade) {
+        if (periodicidade == Periodicidade.ANUAL) {
+            return competenciaAtual.plusYears(1).withDayOfYear(1);
+        }
+
+        return competenciaAtual.plusMonths(1).withDayOfMonth(1);
     }
 
     private ControleEntregaResponse toResponse(ControleEntrega controle) {

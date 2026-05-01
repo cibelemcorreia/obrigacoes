@@ -2,15 +2,20 @@ package br.com.contabilidade.obrigacoes.service;
 
 import br.com.contabilidade.obrigacoes.dto.EmpresaObrigacaoRequest;
 import br.com.contabilidade.obrigacoes.dto.EmpresaObrigacaoResponse;
+import br.com.contabilidade.obrigacoes.entity.ControleEntrega;
 import br.com.contabilidade.obrigacoes.entity.Empresa;
 import br.com.contabilidade.obrigacoes.entity.EmpresaObrigacao;
 import br.com.contabilidade.obrigacoes.entity.ObrigacaoAcessoria;
+import br.com.contabilidade.obrigacoes.entity.Periodicidade;
+import br.com.contabilidade.obrigacoes.entity.StatusEntrega;
 import br.com.contabilidade.obrigacoes.exception.NotFoundException;
+import br.com.contabilidade.obrigacoes.repository.ControleEntregaRepository;
 import br.com.contabilidade.obrigacoes.repository.EmpresaObrigacaoRepository;
 import br.com.contabilidade.obrigacoes.repository.EmpresaRepository;
 import br.com.contabilidade.obrigacoes.repository.ObrigacaoAcessoriaRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -19,13 +24,16 @@ public class EmpresaObrigacaoService {
     private final EmpresaObrigacaoRepository repository;
     private final EmpresaRepository empresaRepository;
     private final ObrigacaoAcessoriaRepository obrigacaoRepository;
+    private final ControleEntregaRepository controleEntregaRepository;
 
     public EmpresaObrigacaoService(EmpresaObrigacaoRepository repository,
                                    EmpresaRepository empresaRepository,
-                                   ObrigacaoAcessoriaRepository obrigacaoRepository) {
+                                   ObrigacaoAcessoriaRepository obrigacaoRepository,
+                                   ControleEntregaRepository controleEntregaRepository) {
         this.repository = repository;
         this.empresaRepository = empresaRepository;
         this.obrigacaoRepository = obrigacaoRepository;
+        this.controleEntregaRepository = controleEntregaRepository;
     }
 
     public List<EmpresaObrigacaoResponse> listar(Long empresaId) {
@@ -53,7 +61,19 @@ public class EmpresaObrigacaoService {
         empresaObrigacao.setEmpresa(empresa);
         empresaObrigacao.setObrigacao(obrigacao);
 
-        return toResponse(repository.save(empresaObrigacao));
+        EmpresaObrigacao vinculoSalvo = repository.save(empresaObrigacao);
+
+        ControleEntrega controleEntrega = new ControleEntrega();
+        controleEntrega.setEmpresaObrigacao(vinculoSalvo);
+        LocalDate hoje = LocalDate.now();
+        controleEntrega.setCompetencia(obrigacao.getPeriodicidade() == Periodicidade.ANUAL
+                ? hoje.minusYears(1).withDayOfYear(1)
+                : hoje.minusMonths(1).withDayOfMonth(1));
+        controleEntrega.setStatus(StatusEntrega.PENDENTE);
+        controleEntrega.setDataEntrega(null);
+        controleEntregaRepository.save(controleEntrega);
+
+        return toResponse(vinculoSalvo);
     }
 
     public void excluir(Long id) {
@@ -61,6 +81,7 @@ public class EmpresaObrigacaoService {
             throw new NotFoundException("Vínculo não encontrado para o id informado");
         }
 
+        controleEntregaRepository.deleteAllByEmpresaObrigacaoId(id);
         repository.deleteById(id);
     }
 

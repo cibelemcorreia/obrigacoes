@@ -34,27 +34,14 @@
     const filtroEmpresaVinculo = document.getElementById("filtroEmpresaVinculo");
     const painelVinculo = document.getElementById("painel-vinculo");
 
-    const formEntrega = document.getElementById("form-entrega");
     const tabelaEntregas = document.getElementById("tabela-entregas");
     const contadorEntregas = document.getElementById("contador-entregas");
-    const entregaEmpresaSelect = document.getElementById("entregaEmpresaId");
-    const entregaEmpresaObrigacaoSelect = document.getElementById("entregaEmpresaObrigacaoId");
-    const entregaCompetenciaInput = document.getElementById("entregaCompetencia");
-    const entregaAnoCompetenciaInput = document.getElementById("entregaAnoCompetencia");
-    const entregaStatusSelect = document.getElementById("entregaStatus");
-    const entregaDataEntregaInput = document.getElementById("entregaDataEntrega");
-    const campoEntregaCompetenciaMes = document.getElementById("campo-entrega-competencia-mes");
-    const campoEntregaCompetenciaAno = document.getElementById("campo-entrega-competencia-ano");
-    const campoDataEntrega = document.getElementById("campo-data-entrega");
-    const submitEntregaButton = document.getElementById("btn-submit-entrega");
-    const cancelarEntregaButton = document.getElementById("btn-cancelar-entrega");
     const filtroEmpresaEntrega = document.getElementById("filtroEmpresaEntrega");
     const filtroCompetenciaEntrega = document.getElementById("filtroCompetenciaEntrega");
     const filtroDepartamentoEntrega = document.getElementById("filtroDepartamentoEntrega");
     const filtroStatusEntrega = document.getElementById("filtroStatusEntrega");
     const aplicarFiltrosEntregaButton = document.getElementById("btn-aplicar-filtros-entrega");
     const limparFiltrosEntregaButton = document.getElementById("btn-limpar-filtros-entrega");
-    const painelEntrega = document.getElementById("painel-entrega");
 
     if (!formObrigacao || !tabelaObrigacoes || !contadorObrigacoes || !obrigacaoIdInput || !nomeInput
         || !departamentoInput || !periodicidadeInput || !tipoPrazoInput || !diaLimiteInput
@@ -63,13 +50,9 @@
         || !contadorEmpresas || !empresaIdInput || !empresaNomeInput || !empresaCnpjInput
         || !submitEmpresaButton || !cancelarEmpresaButton || !formVinculo || !tabelaVinculos
         || !contadorVinculos || !vinculoEmpresaSelect || !vinculoObrigacaoSelect || !filtroEmpresaVinculo
-        || !formEntrega || !tabelaEntregas || !contadorEntregas || !entregaEmpresaSelect
-        || !entregaEmpresaObrigacaoSelect || !entregaCompetenciaInput || !entregaAnoCompetenciaInput
-        || !entregaStatusSelect || !entregaDataEntregaInput || !campoEntregaCompetenciaMes
-        || !campoEntregaCompetenciaAno || !campoDataEntrega || !submitEntregaButton
-        || !cancelarEntregaButton || !filtroEmpresaEntrega || !filtroCompetenciaEntrega
+        || !tabelaEntregas || !contadorEntregas || !filtroEmpresaEntrega || !filtroCompetenciaEntrega
         || !filtroDepartamentoEntrega || !filtroStatusEntrega || !aplicarFiltrosEntregaButton || !limparFiltrosEntregaButton
-        || !painelObrigacao || !painelEmpresa || !painelVinculo || !painelEntrega) {
+        || !painelObrigacao || !painelEmpresa || !painelVinculo) {
         return;
     }
 
@@ -94,6 +77,51 @@
 
     function obterDataHojeIso() {
         return new Date().toISOString().slice(0, 10);
+    }
+
+    function formatarDataIsoParaBr(valor) {
+        if (!valor || !/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+            return "";
+        }
+
+        const [ano, mes, dia] = valor.split("-");
+        return `${dia}-${mes}-${ano}`;
+    }
+
+    function converterDataBrParaIso(valor) {
+        const data = String(valor ?? "").trim();
+        const somenteDigitos = data.replaceAll(/\D/g, "");
+        if (!/^\d{8}$/.test(somenteDigitos)) {
+            return null;
+        }
+
+        const dia = somenteDigitos.slice(0, 2);
+        const mes = somenteDigitos.slice(2, 4);
+        const ano = somenteDigitos.slice(4, 8);
+        const iso = `${ano}-${mes}-${dia}`;
+        const parsed = new Date(`${iso}T00:00:00`);
+        if (Number.isNaN(parsed.getTime())) {
+            return null;
+        }
+
+        return iso;
+    }
+
+    function solicitarDataEntrega(valorPadrao) {
+        const padraoIso = valorPadrao || obterDataHojeIso();
+        const padraoBr = formatarDataIsoParaBr(padraoIso) || "";
+        const resposta = window.prompt("Informe a data da entrega (DDMMAAAA ou DD/MM/AAAA):", padraoBr);
+        if (resposta === null) {
+            return null;
+        }
+
+        const iso = converterDataBrParaIso(resposta);
+        if (!iso) {
+            alert("Data inválida. Use DDMMAAAA (ex.: 01052026) ou DD/MM/AAAA.");
+            return solicitarDataEntrega(padraoIso);
+        }
+
+        return iso;
     }
 
     function converterMesParaCompetencia(valor) {
@@ -478,69 +506,6 @@
         painel.open = true;
     }
 
-    function atualizarStatusEntrega() {
-        const entregue = (entregaStatusSelect.value || "").trim().toUpperCase() === "ENTREGUE";
-        campoDataEntrega.classList.toggle("hidden", !entregue);
-        entregaDataEntregaInput.disabled = !entregue;
-        entregaDataEntregaInput.required = entregue;
-
-        if (entregue && !entregaDataEntregaInput.value) {
-            entregaDataEntregaInput.value = obterDataHojeIso();
-        }
-
-        if (!entregue) {
-            entregaDataEntregaInput.value = "";
-        }
-    }
-
-    function atualizarSelectEmpresasEntrega() {
-        preencherSelect(entregaEmpresaSelect, empresasCache, {
-            getValue: (item) => item.id,
-            getLabel: (item) => item.nome
-        });
-
-        preencherSelect(filtroEmpresaEntrega, empresasCache, {
-            getValue: (item) => item.id,
-            getLabel: (item) => item.nome,
-            includeBlank: true,
-            blankLabel: "Todas as empresas"
-        });
-    }
-
-    function atualizarSelectObrigacoesEntrega() {
-        const empresaId = Number.parseInt(entregaEmpresaSelect.value, 10);
-        const vinculosFiltrados = vinculosCache.filter((item) => item.empresaId === empresaId);
-
-        preencherSelect(entregaEmpresaObrigacaoSelect, vinculosFiltrados, {
-            getValue: (item) => item.id,
-            getLabel: (item) => item.obrigacaoNome
-        });
-
-        atualizarCamposCompetenciaEntrega();
-    }
-
-    function atualizarCamposCompetenciaEntrega() {
-        const vinculoId = Number.parseInt(entregaEmpresaObrigacaoSelect.value, 10);
-        const anual = !Number.isNaN(vinculoId) && ehEntregaAnualPorVinculoId(vinculoId);
-
-        campoEntregaCompetenciaMes.classList.toggle("hidden", anual);
-        entregaCompetenciaInput.disabled = anual;
-        entregaCompetenciaInput.required = !anual;
-
-        campoEntregaCompetenciaAno.classList.toggle("hidden", !anual);
-        entregaAnoCompetenciaInput.disabled = !anual;
-        entregaAnoCompetenciaInput.required = anual;
-
-        if (anual) {
-            entregaCompetenciaInput.value = "";
-            if (!entregaAnoCompetenciaInput.value) {
-                entregaAnoCompetenciaInput.value = new Date().getFullYear();
-            }
-        } else {
-            entregaAnoCompetenciaInput.value = "";
-        }
-    }
-
     function limparFormularioObrigacao() {
         formObrigacao.reset();
         obrigacaoIdInput.value = "";
@@ -580,41 +545,6 @@
         cancelarEmpresaButton.classList.remove("hidden");
     }
 
-    function limparFormularioEntrega() {
-        formEntrega.reset();
-        submitEntregaButton.textContent = "Salvar controle";
-        cancelarEntregaButton.classList.add("hidden");
-        entregaStatusSelect.value = "PENDENTE";
-
-        if (empresasCache.length > 0) {
-            entregaEmpresaSelect.value = String(empresasCache[0].id);
-        }
-
-        atualizarSelectObrigacoesEntrega();
-        atualizarStatusEntrega();
-        atualizarCamposCompetenciaEntrega();
-    }
-
-    function preencherFormularioEntrega(entrega) {
-        abrirPainel(painelEntrega);
-        entregaEmpresaSelect.value = String(entrega.empresaId ?? "");
-        atualizarSelectObrigacoesEntrega();
-        entregaEmpresaObrigacaoSelect.value = String(entrega.empresaObrigacaoId ?? "");
-        atualizarCamposCompetenciaEntrega();
-
-        if (ehEntregaAnualPorVinculoId(entrega.empresaObrigacaoId)) {
-            entregaAnoCompetenciaInput.value = converterCompetenciaParaAno(entrega.competencia);
-        } else {
-            entregaCompetenciaInput.value = converterCompetenciaParaMes(entrega.competencia);
-        }
-
-        entregaStatusSelect.value = entrega.status ?? "PENDENTE";
-        entregaDataEntregaInput.value = entrega.dataEntrega ?? "";
-        submitEntregaButton.textContent = "Atualizar controle";
-        cancelarEntregaButton.classList.remove("hidden");
-        atualizarStatusEntrega();
-    }
-
     function atualizarSelectEmpresas() {
         preencherSelect(vinculoEmpresaSelect, empresasCache, {
             getValue: (item) => item.id,
@@ -628,8 +558,12 @@
             blankLabel: "Todas as empresas"
         });
 
-        atualizarSelectEmpresasEntrega();
-        atualizarSelectObrigacoesEntrega();
+        preencherSelect(filtroEmpresaEntrega, empresasCache, {
+            getValue: (item) => item.id,
+            getLabel: (item) => item.nome,
+            includeBlank: true,
+            blankLabel: "Todas as empresas"
+        });
     }
 
     function atualizarSelectObrigacoes() {
@@ -709,7 +643,6 @@
         const query = filtroEmpresaVinculo.value ? `?empresaId=${encodeURIComponent(filtroEmpresaVinculo.value)}` : "";
         const vinculos = await apiFetch(`/api/empresa-obrigacoes${query}`);
         vinculosCache = await apiFetch("/api/empresa-obrigacoes");
-        atualizarSelectObrigacoesEntrega();
         tabelaVinculos.innerHTML = vinculos.length === 0
             ? renderEstadoVazio(4, "Nenhum vínculo cadastrado.")
             : (() => {
@@ -820,6 +753,9 @@
                 const entregue = (entrega.status || "").toUpperCase() === "ENTREGUE";
                 const rowClass = entregue ? "row-delivered" : "";
                 const chipClass = entregue ? "is-delivered" : "is-pending";
+                const actions = entregue
+                    ? `<button type="button" class="table-action-btn secondary" data-desfazer-entrega="${escapeHtml(entrega.id)}">Desfazer entrega</button>`
+                    : `<button type="button" class="table-action-btn" data-marcar-entregue="${escapeHtml(entrega.id)}">Marcar entregue</button>`;
 
                 return `
                     <tr class="${rowClass}">
@@ -832,8 +768,7 @@
                         <td>${escapeHtml(formatarDataIso(entrega.dataEntrega))}</td>
                         <td>
                             <div class="table-actions">
-                                <button type="button" class="table-action-btn" data-editar-entrega="${escapeHtml(entrega.id)}">Editar</button>
-                                <button type="button" class="table-action-btn danger" data-excluir-entrega="${escapeHtml(entrega.id)}">Excluir</button>
+                                ${actions}
                             </div>
                         </td>
                     </tr>
@@ -926,36 +861,6 @@
             });
             await carregarVinculos();
             await carregarEntregas();
-            limparFormularioEntrega();
-        } catch (error) {
-            alert(error.message);
-        }
-    });
-
-    formEntrega.addEventListener("submit", async (event) => {
-        event.preventDefault();
-
-        const vinculoId = Number.parseInt(entregaEmpresaObrigacaoSelect.value, 10);
-        const competencia = ehEntregaAnualPorVinculoId(vinculoId)
-            ? converterAnoParaCompetencia(entregaAnoCompetenciaInput.value)
-            : converterMesParaCompetencia(entregaCompetenciaInput.value);
-        if (!competencia) {
-            return;
-        }
-
-        try {
-            await apiFetch("/api/controles-entrega", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    empresaObrigacaoId: Number.parseInt(entregaEmpresaObrigacaoSelect.value, 10),
-                    competencia,
-                    status: entregaStatusSelect.value,
-                    dataEntrega: entregaDataEntregaInput.disabled ? null : (entregaDataEntregaInput.value || null)
-                })
-            });
-            limparFormularioEntrega();
-            await carregarEntregas();
         } catch (error) {
             alert(error.message);
         }
@@ -963,15 +868,11 @@
 
     periodicidadeInput.addEventListener("change", atualizarMesLimite);
     tipoPrazoInput.addEventListener("change", atualizarTipoPrazo);
-    entregaEmpresaSelect.addEventListener("change", atualizarSelectObrigacoesEntrega);
-    entregaEmpresaObrigacaoSelect.addEventListener("change", atualizarCamposCompetenciaEntrega);
-    entregaStatusSelect.addEventListener("change", atualizarStatusEntrega);
     empresaCnpjInput.addEventListener("input", () => {
         empresaCnpjInput.value = formatarCnpjParcial(empresaCnpjInput.value);
     });
     cancelarObrigacaoButton.addEventListener("click", limparFormularioObrigacao);
     cancelarEmpresaButton.addEventListener("click", limparFormularioEmpresa);
-    cancelarEntregaButton.addEventListener("click", limparFormularioEntrega);
     filtroEmpresaVinculo.addEventListener("change", () => {
         carregarVinculos().catch((error) => alert(error.message));
     });
@@ -1091,39 +992,48 @@
             await apiFetch(`/api/empresa-obrigacoes/${id}`, { method: "DELETE" });
             await carregarVinculos();
             await carregarEntregas();
-            limparFormularioEntrega();
         } catch (error) {
             alert(error.message);
         }
     });
 
     tabelaEntregas.addEventListener("click", async (event) => {
-        const editarButton = event.target.closest("[data-editar-entrega]");
-        const excluirButton = event.target.closest("[data-excluir-entrega]");
+        const marcarEntregueButton = event.target.closest("[data-marcar-entregue]");
+        const desfazerEntregaButton = event.target.closest("[data-desfazer-entrega]");
+        const actionButton = marcarEntregueButton || desfazerEntregaButton;
+        if (!actionButton) return;
 
-        if (editarButton) {
-            const id = Number.parseInt(editarButton.dataset.editarEntrega, 10);
-            const entrega = entregasCache.find((item) => item.id === id);
-            if (entrega) {
-                preencherFormularioEntrega(entrega);
-                formEntrega.scrollIntoView({ behavior: "smooth", block: "start" });
-            }
+        const id = marcarEntregueButton
+            ? Number.parseInt(marcarEntregueButton.dataset.marcarEntregue, 10)
+            : Number.parseInt(desfazerEntregaButton.dataset.desfazerEntrega, 10);
+        const entrega = entregasCache.find((item) => item.id === id);
+        if (!entrega) {
             return;
         }
 
-        if (!excluirButton) {
-            return;
-        }
+        const desfazendo = Boolean(desfazerEntregaButton);
+        const mensagemConfirmacao = desfazendo
+            ? "Desfazer entrega e marcar como pendente?"
+            : "Marcar esta obrigação como entregue?";
+        if (!window.confirm(mensagemConfirmacao)) return;
 
-        const id = Number.parseInt(excluirButton.dataset.excluirEntrega, 10);
-        if (!window.confirm("Deseja realmente excluir este controle de entrega?")) {
+        const dataEntregaSelecionada = desfazendo ? null : solicitarDataEntrega(obterDataHojeIso());
+        if (!desfazendo && !dataEntregaSelecionada) {
             return;
         }
 
         try {
-            await apiFetch(`/api/controles-entrega/${id}`, { method: "DELETE" });
+            await apiFetch("/api/controles-entrega", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    empresaObrigacaoId: entrega.empresaObrigacaoId,
+                    competencia: entrega.competencia,
+                    status: desfazendo ? "PENDENTE" : "ENTREGUE",
+                    dataEntrega: dataEntregaSelecionada
+                })
+            });
             await carregarEntregas();
-            limparFormularioEntrega();
         } catch (error) {
             alert(error.message);
         }
@@ -1131,7 +1041,6 @@
 
     limparFormularioObrigacao();
     limparFormularioEmpresa();
-    limparFormularioEntrega();
 
     Promise.all([
         carregarObrigacoes(),
@@ -1145,4 +1054,3 @@
             alert(error.message);
         });
 });
-

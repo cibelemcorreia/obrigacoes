@@ -14,4 +14,6 @@ public interface ControleEntregaRepository extends JpaRepository<ControleEntrega
     List<ControleEntrega> findAllByOrderByCompetenciaDescEmpresaObrigacaoEmpresaNomeAscEmpresaObrigacaoObrigacaoNomeAsc();
 
     Optional<ControleEntrega> findByEmpresaObrigacaoIdAndCompetencia(Long empresaObrigacaoId, LocalDate competencia);
+
+    void deleteAllByEmpresaObrigacaoId(Long empresaObrigacaoId);
 }
