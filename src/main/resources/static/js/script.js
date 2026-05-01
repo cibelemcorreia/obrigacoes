@@ -43,14 +43,14 @@
     const aplicarFiltrosEntregaButton = document.getElementById("btn-aplicar-filtros-entrega");
     const limparFiltrosEntregaButton = document.getElementById("btn-limpar-filtros-entrega");
 
-    if (!formObrigacao || !tabelaObrigacoes || !contadorObrigacoes || !obrigacaoIdInput || !nomeInput
+    if (!formObrigacao || !tabelaObrigacoes || !obrigacaoIdInput || !nomeInput
         || !departamentoInput || !periodicidadeInput || !tipoPrazoInput || !diaLimiteInput
         || !numeroDiaUtilInput || !mesLimiteInput || !campoDiaLimite || !campoDiaUtil
         || !submitObrigacaoButton || !cancelarObrigacaoButton || !formEmpresa || !tabelaEmpresas
-        || !contadorEmpresas || !empresaIdInput || !empresaNomeInput || !empresaCnpjInput
+        || !empresaIdInput || !empresaNomeInput || !empresaCnpjInput
         || !submitEmpresaButton || !cancelarEmpresaButton || !formVinculo || !tabelaVinculos
-        || !contadorVinculos || !vinculoEmpresaSelect || !vinculoObrigacaoSelect || !filtroEmpresaVinculo
-        || !tabelaEntregas || !contadorEntregas || !filtroEmpresaEntrega || !filtroCompetenciaEntrega
+        || !vinculoEmpresaSelect || !vinculoObrigacaoSelect || !filtroEmpresaVinculo
+        || !tabelaEntregas || !filtroEmpresaEntrega || !filtroCompetenciaEntrega
         || !filtroDepartamentoEntrega || !filtroStatusEntrega || !aplicarFiltrosEntregaButton || !limparFiltrosEntregaButton
         || !painelObrigacao || !painelEmpresa || !painelVinculo) {
         return;
@@ -60,6 +60,65 @@
     let empresasCache = [];
     let vinculosCache = [];
     let entregasCache = [];
+
+    const appTopbar = document.querySelector(".app-topbar");
+    const menuToggleButton = document.getElementById("btn-menu");
+    const homeButton = document.getElementById("app-home");
+    const navLinks = Array.from(document.querySelectorAll("[data-nav-page]"));
+    const appPages = Array.from(document.querySelectorAll(".app-page[data-page]"));
+
+    function selecionarPagina(pageId) {
+        const alvo = appPages.find((page) => page.dataset.page === pageId) ?? appPages[0];
+        if (!alvo) {
+            return;
+        }
+
+        appPages.forEach((page) => page.toggleAttribute("hidden", page !== alvo));
+        navLinks.forEach((link) => link.classList.toggle("is-active", link.dataset.navPage === alvo.dataset.page));
+
+        if (appTopbar) {
+            appTopbar.classList.remove("is-menu-open");
+        }
+        if (menuToggleButton) {
+            menuToggleButton.setAttribute("aria-expanded", "false");
+        }
+
+        const hashDesejado = `#${alvo.dataset.page}`;
+        if (window.location.hash !== hashDesejado) {
+            window.location.hash = hashDesejado;
+        }
+    }
+
+    function obterPaginaDaUrl() {
+        const raw = String(window.location.hash || "").replace(/^#/, "").trim();
+        return raw || "cadastros";
+    }
+
+    if (menuToggleButton && appTopbar) {
+        menuToggleButton.addEventListener("click", () => {
+            const aberto = appTopbar.classList.toggle("is-menu-open");
+            menuToggleButton.setAttribute("aria-expanded", aberto ? "true" : "false");
+        });
+    }
+
+    if (homeButton) {
+        homeButton.addEventListener("click", () => {
+            selecionarPagina("cadastros");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+    }
+
+    navLinks.forEach((link) => {
+        link.addEventListener("click", () => {
+            selecionarPagina(link.dataset.navPage);
+        });
+    });
+
+    window.addEventListener("hashchange", () => {
+        selecionarPagina(obterPaginaDaUrl());
+    });
+
+    selecionarPagina(obterPaginaDaUrl());
 
     function escapeHtml(value) {
         return String(value ?? "")
@@ -71,6 +130,9 @@
     }
 
     function atualizarContador(elemento, total) {
+        if (!elemento) {
+            return;
+        }
         const sufixo = total === 1 ? "registro" : "registros";
         elemento.textContent = `${total} ${sufixo}`;
     }
@@ -515,7 +577,6 @@
     }
 
     function preencherFormularioObrigacao(obrigacao) {
-        abrirPainel(painelObrigacao);
         obrigacaoIdInput.value = obrigacao.id ?? "";
         nomeInput.value = obrigacao.nome ?? "";
         departamentoInput.value = obrigacao.departamento ?? "FISCAL";
@@ -537,7 +598,6 @@
     }
 
     function preencherFormularioEmpresa(empresa) {
-        abrirPainel(painelEmpresa);
         empresaIdInput.value = empresa.id ?? "";
         empresaNomeInput.value = empresa.nome ?? "";
         empresaCnpjInput.value = formatarCnpj(empresa.cnpj);
@@ -576,36 +636,18 @@
     async function carregarObrigacoes() {
         obrigacoesCache = await apiFetch("/api/obrigacoes");
         tabelaObrigacoes.innerHTML = obrigacoesCache.length === 0
-            ? renderEstadoVazio(4, "Nenhuma obrigação cadastrada.")
+            ? renderEstadoVazio(6, "Nenhuma obrigação cadastrada.")
             : obrigacoesCache.map((obrigacao) => {
                 const prazo = formatarPrazo(obrigacao);
                 const mes = formatarMesLimite(obrigacao);
-                const mensal = String(obrigacao.periodicidade || "").trim().toUpperCase() === "MENSAL";
-                const temDetalhes = (prazo && prazo !== "-") || (mes && mes !== "-");
-                const exibirMes = !mensal && mes && mes !== "-";
-
-                const toggleDetalhes = temDetalhes
-                    ? `
-                        <details class="row-details-inline">
-                            <summary class="row-details-summary" aria-label="Abrir"></summary>
-                            <div class="row-details-body">
-                                <div class="row-details-line"><strong>Prazo:</strong> ${escapeHtml(prazo || "-")}</div>
-                                ${exibirMes ? `<div class="row-details-line"><strong>Mês:</strong> ${escapeHtml(mes || "-")}</div>` : ""}
-                            </div>
-                        </details>
-                    `
-                    : "";
 
                 return `
                     <tr>
-                        <td>
-                            <div class="cell-inline-toggle">
-                                <span class="cell-inline-toggle-text">${escapeHtml(obrigacao.nome ?? "-")}</span>
-                                ${toggleDetalhes}
-                            </div>
-                        </td>
+                        <td>${escapeHtml(obrigacao.nome ?? "-")}</td>
                         <td>${escapeHtml(formatarDepartamento(obrigacao.departamento))}</td>
                         <td>${escapeHtml(formatarPeriodicidade(obrigacao.periodicidade))}</td>
+                        <td>${escapeHtml(prazo || "-")}</td>
+                        <td>${escapeHtml(mes || "-")}</td>
                         <td>
                             <div class="table-actions">
                                 <button type="button" class="table-action-btn" data-editar-obrigacao="${escapeHtml(obrigacao.id)}">Editar</button>

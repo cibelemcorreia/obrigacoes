@@ -15,213 +15,259 @@
 </head>
 
 <body>
-    <main class="page">
-        <section class="hero">
-            <div class="hero-copy">
-                <p class="eyebrow">Painel de Controle</p>
-                <h1>Obrigações</h1>
-                <p class="subtitle">Controle prazos de declarações, apurações e rotinas com organização centralizada.</p>
+    <main class="page app-shell">
+        <header class="app-topbar">
+            <div class="app-brand">
+                <button type="button" class="app-menu-toggle" id="btn-menu" aria-label="Abrir menu" aria-expanded="false">
+                    <span class="app-menu-toggle-bar"></span>
+                    <span class="app-menu-toggle-bar"></span>
+                    <span class="app-menu-toggle-bar"></span>
+                </button>
+                <button type="button" class="app-brand-text" id="app-home" aria-label="Voltar para o início">
+                    <p class="app-brand-eyebrow">Painel de Controle</p>
+                    <h1 class="app-brand-title">Obrigações</h1>
+                </button>
             </div>
-        </section>
+            <nav class="app-nav" id="app-nav" aria-label="Menu principal">
+                <button type="button" class="app-nav-link" data-nav-page="cadastros">Cadastros</button>
+                <button type="button" class="app-nav-link" data-nav-page="vinculos">Vínculos</button>
+                <button type="button" class="app-nav-link" data-nav-page="controle">Controle</button>
+            </nav>
+        </header>
 
-        <section class="workspace-section">
-            <div class="board-grid board-grid-primary">
-                <section class="card card-panel form-card">
-                    <div class="section-title">
-                        <div>
-                            <h2>Cadastrar obrigações</h2>
-                        </div>
-                        <span id="contador-obrigacoes" class="counter">0 registros</span>
-                    </div>
-                    <details id="painel-obrigacao" class="details-panel">
-                        <summary class="details-summary">
-                            <span class="details-title">Detalhes da obrigação</span>
-                            <span class="details-meta">Abra para cadastrar ou editar</span>
-                        </summary>
-                        <div class="details-body">
-                            <form id="form-obrigacao" class="form-grid">
-                                <input type="hidden" id="obrigacaoId">
-                                <label class="field">
-                                    <span>Nome</span>
-                                    <input type="text" id="nome" placeholder="Ex.: EFD-Contribuições" required>
-                                </label>
-
-                                <label class="field">
-                                    <span>Departamento</span>
-                                    <select id="departamento" required>
-                                        <option value="CONTABIL">Contábil</option>
-                                        <option value="FISCAL">Fiscal</option>
-                                        <option value="PESSOAL">Pessoal</option>
-                                    </select>
-                                </label>
-
-                                <label class="field">
-                                    <span>Periodicidade</span>
-                                    <select id="periodicidade" required>
-                                        <option value="MENSAL">Mensal</option>
-                                        <option value="ANUAL">Anual</option>
-                                    </select>
-                                </label>
-
-                                <label class="field">
-                                    <span>Tipo de prazo</span>
-                                    <select id="tipoPrazo" required>
-                                        <option value="DIA_FIXO">Dia fixo</option>
-                                        <option value="DIA_UTIL">N dia útil</option>
-                                        <option value="ULTIMO_DIA_UTIL">Último dia útil</option>
-                                    </select>
-                                </label>
-
-                                <label class="field" id="campo-dia-limite">
-                                    <span>Dia</span>
-                                    <input type="number" id="diaLimite" min="1" max="31" step="1" required>
-                                </label>
-
-                                <label class="field" id="campo-dia-util">
-                                    <span>Número do dia útil</span>
-                                    <input type="number" id="numeroDiaUtil" min="1" max="23" step="1">
-                                </label>
-
-                                <label class="field" id="campo-mes-limite">
-                                    <span>Mês</span>
-                                    <input type="number" id="mesLimite" min="1" max="12" step="1" required>
-                                </label>
-
-                                <div class="form-actions">
-                                    <button type="submit" id="btn-submit">Salvar</button>
-                                    <button type="button" id="btn-cancelar-edicao" class="secondary hidden">Cancelar</button>
-                                </div>
-                            </form>
-                        </div>
-                    </details>
-
-                    <div class="table-wrapper compact-table table-scroll">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Nome</th>
-                                    <th>Departamento</th>
-                                    <th>Periodicidade</th>
-                                    <th aria-label="Ações"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabela-obrigacoes"></tbody>
-                        </table>
+        <div class="app-pages">
+            <section class="app-page" data-page="cadastros">
+                <section class="hero hero-compact">
+                    <div class="hero-copy">
+                        <p class="eyebrow">Cadastros</p>
+                        <p class="subtitle">Cadastre obrigações e empresas.</p>
                     </div>
                 </section>
 
-                <section class="card card-panel table-card">
-                    <div class="section-title">
-                        <div>
-                            <h2>Cadastrar empresas</h2>
-                        </div>
-                        <span id="contador-empresas" class="counter">0 registros</span>
-                    </div>
-                    <details id="painel-empresa" class="details-panel">
-                        <summary class="details-summary">
-                            <span class="details-title">Detalhes da empresa</span>
-                            <span class="details-meta">Abra para cadastrar ou editar</span>
-                        </summary>
-                        <div class="details-body">
-                            <form id="form-empresa" class="form-grid form-grid-compact">
-                                <input type="hidden" id="empresaId">
-                                <label class="field">
-                                    <span>Nome da empresa</span>
-                                    <input type="text" id="empresaNome" placeholder="Ex.: Empresa Exemplo Ltda" required>
-                                </label>
-
-                                <label class="field">
-                                    <span>CNPJ</span>
-                                    <input type="text" id="empresaCnpj" placeholder="00.000.000/0000-00" required>
-                                </label>
-
-                                <div class="form-actions">
-                                    <button type="submit" id="btn-submit-empresa">Salvar empresa</button>
-                                    <button type="button" id="btn-cancelar-empresa" class="secondary hidden">Cancelar</button>
+                <section class="workspace-section">
+                    <div class="board-grid board-grid-single">
+                        <section class="card card-panel form-card">
+                            <div class="section-title">
+                                <div>
+                                    <h2>Cadastrar obrigações</h2>
                                 </div>
-                            </form>
-                        </div>
-                    </details>
-
-                    <div class="table-wrapper compact-table table-scroll">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Nome</th>
-                                    <th>CNPJ</th>
-                                    <th aria-label="Ações"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabela-empresas"></tbody>
-                        </table>
-                    </div>
-                </section>
-            </div>
-        </section>
-
-        <section class="workspace-section">
-            <div class="board-grid board-grid-deliveries">
-                <section class="card card-panel table-card vinculo-card">
-                    <div class="section-title">
-                        <div>
-                            <h2>Vincular obrigações</h2>
-                        </div>
-                        <span id="contador-vinculos" class="counter">0 registros</span>
-                    </div>
-                    <details id="painel-vinculo" class="details-panel">
-                        <summary class="details-summary">
-                            <span class="details-title">Detalhes do vínculo</span>
-                            <span class="details-meta">Abra para vincular e filtrar</span>
-                        </summary>
-                        <div class="details-body">
-                            <div class="card-toolbar">
-                                <form id="form-vinculo" class="form-grid form-grid-toolbar">
+                            </div>
+                            <div class="details-body">
+                                <form id="form-obrigacao" class="form-grid">
+                                    <input type="hidden" id="obrigacaoId">
                                     <label class="field">
-                                        <span>Empresa</span>
-                                        <select id="vinculoEmpresaId" required></select>
+                                        <span>Nome</span>
+                                        <input type="text" id="nome" placeholder="Ex.: EFD-Contribuições" required>
                                     </label>
 
                                     <label class="field">
-                                        <span>Obrigação</span>
-                                        <select id="vinculoObrigacaoId" required></select>
+                                        <span>Departamento</span>
+                                        <select id="departamento" required>
+                                            <option value="CONTABIL">Contábil</option>
+                                            <option value="FISCAL">Fiscal</option>
+                                            <option value="PESSOAL">Pessoal</option>
+                                        </select>
+                                    </label>
+
+                                    <label class="field">
+                                        <span>Periodicidade</span>
+                                        <select id="periodicidade" required>
+                                            <option value="MENSAL">Mensal</option>
+                                            <option value="ANUAL">Anual</option>
+                                        </select>
+                                    </label>
+
+                                    <label class="field">
+                                        <span>Tipo de prazo</span>
+                                        <select id="tipoPrazo" required>
+                                            <option value="DIA_FIXO">Dia fixo</option>
+                                            <option value="DIA_UTIL">N dia útil</option>
+                                            <option value="ULTIMO_DIA_UTIL">Último dia útil</option>
+                                        </select>
+                                    </label>
+
+                                    <label class="field" id="campo-dia-limite">
+                                        <span>Dia</span>
+                                        <input type="number" id="diaLimite" min="1" max="31" step="1" required>
+                                    </label>
+
+                                    <label class="field" id="campo-dia-util">
+                                        <span>Número do dia útil</span>
+                                        <input type="number" id="numeroDiaUtil" min="1" max="23" step="1">
+                                    </label>
+
+                                    <label class="field" id="campo-mes-limite">
+                                        <span>Mês</span>
+                                        <input type="number" id="mesLimite" min="1" max="12" step="1" required>
                                     </label>
 
                                     <div class="form-actions">
-                                        <button type="submit" id="btn-submit-vinculo">Vincular</button>
+                                        <button type="submit" id="btn-submit">Salvar</button>
+                                        <button type="button" id="btn-cancelar-edicao" class="secondary hidden">Cancelar</button>
                                     </div>
                                 </form>
-
-                                <div class="filter-row filter-row-inline">
-                                    <label class="field">
-                                        <span>Filtrar por empresa</span>
-                                        <select id="filtroEmpresaVinculo"></select>
-                                    </label>
-                                </div>
                             </div>
-                        </div>
-                    </details>
 
-                    <div class="table-wrapper table-scroll">
-                        <table class="table-vinculos">
-                            <thead>
-                                <tr>
-                                    <th>Empresa</th>
-                                    <th>CNPJ</th>
-                                    <th>Obrigação</th>
-                                    <th aria-label="Ações"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabela-vinculos"></tbody>
-                        </table>
+                            <details id="painel-obrigacao" class="details-panel">
+                                <summary class="details-summary">
+                                    <span class="details-title">Lista de obrigações</span>
+                                    <span class="details-meta">Clique para expandir</span>
+                                </summary>
+                                <div class="details-body">
+                                    <div class="table-wrapper compact-table table-scroll">
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Nome</th>
+                                                    <th>Departamento</th>
+                                                    <th>Periodicidade</th>
+                                                    <th>Prazo</th>
+                                                    <th>Mês</th>
+                                                    <th aria-label="Ações"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tabela-obrigacoes"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </details>
+	                </section>
+
+	                        <section class="card card-panel table-card">
+	                            <div class="section-title">
+	                                <div>
+	                                    <h2>Cadastrar empresas</h2>
+	                                </div>
+	                            </div>
+	                            <div class="details-body">
+	                                <form id="form-empresa" class="form-grid form-grid-compact">
+	                                    <input type="hidden" id="empresaId">
+	                                    <label class="field">
+	                                        <span>Nome da empresa</span>
+	                                        <input type="text" id="empresaNome" placeholder="Ex.: Empresa Exemplo Ltda" required>
+	                                    </label>
+
+	                                    <label class="field">
+	                                        <span>CNPJ</span>
+	                                        <input type="text" id="empresaCnpj" placeholder="00.000.000/0000-00" required>
+	                                    </label>
+
+	                                    <div class="form-actions">
+	                                        <button type="submit" id="btn-submit-empresa">Salvar empresa</button>
+	                                        <button type="button" id="btn-cancelar-empresa" class="secondary hidden">Cancelar</button>
+	                                    </div>
+	                                </form>
+	                            </div>
+
+	                            <details id="painel-empresa" class="details-panel">
+	                                <summary class="details-summary">
+	                                    <span class="details-title">Lista de empresas</span>
+	                                    <span class="details-meta">Clique para expandir</span>
+	                                </summary>
+	                                <div class="details-body">
+	                                    <div class="table-wrapper compact-table table-scroll">
+	                                        <table>
+	                                            <thead>
+	                                                <tr>
+	                                                    <th>Nome</th>
+	                                                    <th>CNPJ</th>
+	                                                    <th aria-label="Ações"></th>
+	                                                </tr>
+	                                            </thead>
+	                                            <tbody id="tabela-empresas"></tbody>
+	                                        </table>
+	                                    </div>
+	                                </div>
+	                            </details>
+	                        </section>
+                    </div>
+                </section>
+            </section>
+
+            <section class="app-page" data-page="vinculos">
+                <section class="hero hero-compact">
+                    <div class="hero-copy">
+                        <p class="eyebrow">Vínculos</p>
+                        <p class="subtitle">Vincule obrigações às empresas.</p>
                     </div>
                 </section>
 
-                <section class="card card-panel table-card filters-card">
+                <section class="workspace-section">
+                    <div class="board-grid board-grid-single">
+	                        <section class="card card-panel table-card">
+	                            <div class="section-title">
+	                                <div>
+	                                    <h2>Vincular obrigações</h2>
+	                                </div>
+	                            </div>
+	                            <div class="details-body">
+	                                <div class="control-shell">
+	                                    <form id="form-vinculo" class="form-grid form-grid-delivery">
+	                                        <label class="field">
+	                                            <span>Empresa</span>
+	                                            <select id="vinculoEmpresaId" required></select>
+	                                        </label>
+
+	                                        <label class="field">
+	                                            <span>Obrigação</span>
+	                                            <select id="vinculoObrigacaoId" required></select>
+	                                        </label>
+
+	                                        <div class="form-actions">
+	                                            <button type="submit" id="btn-submit-vinculo">Vincular</button>
+	                                        </div>
+	                                    </form>
+	                                </div>
+	                            </div>
+
+	                            <details id="painel-vinculo" class="details-panel">
+	                                <summary class="details-summary">
+	                                    <span class="details-title">Lista de vínculos</span>
+	                                    <span class="details-meta">Clique para expandir</span>
+	                                </summary>
+	                                <div class="details-body">
+	                                    <div class="filter-row filter-row-inline">
+	                                        <label class="field">
+	                                            <span>Filtrar por empresa</span>
+	                                            <select id="filtroEmpresaVinculo"></select>
+	                                        </label>
+	                                    </div>
+
+	                                    <div class="table-wrapper table-scroll">
+	                                        <table class="table-vinculos">
+	                                            <thead>
+	                                                <tr>
+	                                                    <th>Empresa</th>
+	                                                    <th>CNPJ</th>
+	                                                    <th>Obrigação</th>
+	                                                    <th aria-label="Ações"></th>
+	                                                </tr>
+	                                            </thead>
+	                                            <tbody id="tabela-vinculos"></tbody>
+	                                        </table>
+	                                    </div>
+	                                </div>
+	                            </details>
+	                        </section>
+                    </div>
+                </section>
+            </section>
+
+            <section class="app-page" data-page="controle">
+                <section class="hero hero-compact">
+                    <div class="hero-copy">
+                        <p class="eyebrow">Controle</p>
+                        <p class="subtitle">Filtre e marque entregas com data informada.</p>
+                    </div>
+                </section>
+
+                <section class="workspace-section">
+                    <div class="board-grid board-grid-single">
+                        <section class="card card-panel table-card filters-card">
                     <div class="section-title">
                         <div>
-                            <h2>Controle</h2>
+                            <h2>Controlar entregas</h2>
                         </div>
-                        <span id="contador-entregas" class="counter">0 registros</span>
                     </div>
 
                     <div class="filters-shell standalone">
@@ -280,8 +326,10 @@
                         </table>
                     </div>
                 </section>
-            </div>
-        </section>
+                    </div>
+                </section>
+            </section>
+        </div>
     </main>
 
     <script src="/js/script.js" defer></script>
