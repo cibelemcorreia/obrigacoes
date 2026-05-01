@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+﻿document.addEventListener("DOMContentLoaded", () => {
     const formObrigacao = document.getElementById("form-obrigacao");
     const tabelaObrigacoes = document.getElementById("tabela-obrigacoes");
     const contadorObrigacoes = document.getElementById("contador-obrigacoes");
@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const campoDiaUtil = document.getElementById("campo-dia-util");
     const submitObrigacaoButton = document.getElementById("btn-submit");
     const cancelarObrigacaoButton = document.getElementById("btn-cancelar-edicao");
+    const painelObrigacao = document.getElementById("painel-obrigacao");
 
     const formEmpresa = document.getElementById("form-empresa");
     const tabelaEmpresas = document.getElementById("tabela-empresas");
@@ -23,6 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const empresaCnpjInput = document.getElementById("empresaCnpj");
     const submitEmpresaButton = document.getElementById("btn-submit-empresa");
     const cancelarEmpresaButton = document.getElementById("btn-cancelar-empresa");
+    const painelEmpresa = document.getElementById("painel-empresa");
 
     const formVinculo = document.getElementById("form-vinculo");
     const tabelaVinculos = document.getElementById("tabela-vinculos");
@@ -30,6 +32,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const vinculoEmpresaSelect = document.getElementById("vinculoEmpresaId");
     const vinculoObrigacaoSelect = document.getElementById("vinculoObrigacaoId");
     const filtroEmpresaVinculo = document.getElementById("filtroEmpresaVinculo");
+    const painelVinculo = document.getElementById("painel-vinculo");
+
+    const formEntrega = document.getElementById("form-entrega");
+    const tabelaEntregas = document.getElementById("tabela-entregas");
+    const contadorEntregas = document.getElementById("contador-entregas");
+    const entregaEmpresaSelect = document.getElementById("entregaEmpresaId");
+    const entregaEmpresaObrigacaoSelect = document.getElementById("entregaEmpresaObrigacaoId");
+    const entregaCompetenciaInput = document.getElementById("entregaCompetencia");
+    const entregaAnoCompetenciaInput = document.getElementById("entregaAnoCompetencia");
+    const entregaStatusSelect = document.getElementById("entregaStatus");
+    const entregaDataEntregaInput = document.getElementById("entregaDataEntrega");
+    const campoEntregaCompetenciaMes = document.getElementById("campo-entrega-competencia-mes");
+    const campoEntregaCompetenciaAno = document.getElementById("campo-entrega-competencia-ano");
+    const campoDataEntrega = document.getElementById("campo-data-entrega");
+    const submitEntregaButton = document.getElementById("btn-submit-entrega");
+    const cancelarEntregaButton = document.getElementById("btn-cancelar-entrega");
+    const filtroEmpresaEntrega = document.getElementById("filtroEmpresaEntrega");
+    const filtroCompetenciaEntrega = document.getElementById("filtroCompetenciaEntrega");
+    const filtroDepartamentoEntrega = document.getElementById("filtroDepartamentoEntrega");
+    const filtroStatusEntrega = document.getElementById("filtroStatusEntrega");
+    const aplicarFiltrosEntregaButton = document.getElementById("btn-aplicar-filtros-entrega");
+    const limparFiltrosEntregaButton = document.getElementById("btn-limpar-filtros-entrega");
+    const painelEntrega = document.getElementById("painel-entrega");
 
     if (!formObrigacao || !tabelaObrigacoes || !contadorObrigacoes || !obrigacaoIdInput || !nomeInput
         || !departamentoInput || !periodicidadeInput || !tipoPrazoInput || !diaLimiteInput
@@ -37,12 +62,21 @@ document.addEventListener("DOMContentLoaded", () => {
         || !submitObrigacaoButton || !cancelarObrigacaoButton || !formEmpresa || !tabelaEmpresas
         || !contadorEmpresas || !empresaIdInput || !empresaNomeInput || !empresaCnpjInput
         || !submitEmpresaButton || !cancelarEmpresaButton || !formVinculo || !tabelaVinculos
-        || !contadorVinculos || !vinculoEmpresaSelect || !vinculoObrigacaoSelect || !filtroEmpresaVinculo) {
+        || !contadorVinculos || !vinculoEmpresaSelect || !vinculoObrigacaoSelect || !filtroEmpresaVinculo
+        || !formEntrega || !tabelaEntregas || !contadorEntregas || !entregaEmpresaSelect
+        || !entregaEmpresaObrigacaoSelect || !entregaCompetenciaInput || !entregaAnoCompetenciaInput
+        || !entregaStatusSelect || !entregaDataEntregaInput || !campoEntregaCompetenciaMes
+        || !campoEntregaCompetenciaAno || !campoDataEntrega || !submitEntregaButton
+        || !cancelarEntregaButton || !filtroEmpresaEntrega || !filtroCompetenciaEntrega
+        || !filtroDepartamentoEntrega || !filtroStatusEntrega || !aplicarFiltrosEntregaButton || !limparFiltrosEntregaButton
+        || !painelObrigacao || !painelEmpresa || !painelVinculo || !painelEntrega) {
         return;
     }
 
     let obrigacoesCache = [];
     let empresasCache = [];
+    let vinculosCache = [];
+    let entregasCache = [];
 
     function escapeHtml(value) {
         return String(value ?? "")
@@ -56,6 +90,43 @@ document.addEventListener("DOMContentLoaded", () => {
     function atualizarContador(elemento, total) {
         const sufixo = total === 1 ? "registro" : "registros";
         elemento.textContent = `${total} ${sufixo}`;
+    }
+
+    function obterDataHojeIso() {
+        return new Date().toISOString().slice(0, 10);
+    }
+
+    function converterMesParaCompetencia(valor) {
+        if (!valor || !/^\d{4}-\d{2}$/.test(valor)) {
+            return null;
+        }
+
+        return `${valor}-01`;
+    }
+
+    function converterCompetenciaParaMes(valor) {
+        if (!valor || !/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+            return "";
+        }
+
+        return valor.slice(0, 7);
+    }
+
+    function converterAnoParaCompetencia(valor) {
+        const ano = String(valor || "").trim();
+        if (!/^\d{4}$/.test(ano)) {
+            return null;
+        }
+
+        return `${ano}-01-01`;
+    }
+
+    function converterCompetenciaParaAno(valor) {
+        if (!valor || !/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+            return "";
+        }
+
+        return valor.slice(0, 4);
     }
 
     async function apiFetch(url, options = {}) {
@@ -129,6 +200,57 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function formatarData(data) {
         return new Intl.DateTimeFormat("pt-BR").format(data);
+    }
+
+    function formatarDataIso(dataIso) {
+        if (!dataIso) {
+            return "-";
+        }
+
+        const data = new Date(`${dataIso}T00:00:00`);
+        return Number.isNaN(data.getTime()) ? dataIso : formatarData(data);
+    }
+
+    function formatarCompetencia(competencia) {
+        if (!competencia) {
+            return "-";
+        }
+
+        const [ano, mes] = competencia.split("-");
+        if (!ano || !mes) {
+            return competencia;
+        }
+
+        return `${mes}/${ano}`;
+    }
+
+    function obterObrigacaoPorId(obrigacaoId) {
+        return obrigacoesCache.find((item) => item.id === obrigacaoId) ?? null;
+    }
+
+    function obterVinculoPorId(vinculoId) {
+        return vinculosCache.find((item) => item.id === vinculoId) ?? null;
+    }
+
+    function obterPeriodicidadeDaObrigacao(obrigacaoId) {
+        return obterObrigacaoPorId(obrigacaoId)?.periodicidade ?? null;
+    }
+
+    function ehPeriodicidadeAnual(periodicidade) {
+        return (periodicidade || "").trim().toUpperCase() === "ANUAL";
+    }
+
+    function ehEntregaAnualPorVinculoId(vinculoId) {
+        const vinculo = obterVinculoPorId(vinculoId);
+        return vinculo ? ehPeriodicidadeAnual(obterPeriodicidadeDaObrigacao(vinculo.obrigacaoId)) : false;
+    }
+
+    function formatarCompetenciaEntrega(entrega) {
+        if (ehPeriodicidadeAnual(obterPeriodicidadeDaObrigacao(entrega.obrigacaoId))) {
+            return converterCompetenciaParaAno(entrega.competencia) || "-";
+        }
+
+        return formatarCompetencia(entrega.competencia);
     }
 
     function ehDiaUtilCalendario(data) {
@@ -257,20 +379,21 @@ document.addEventListener("DOMContentLoaded", () => {
         return periodicidade || "-";
     }
 
+    function formatarStatusEntrega(status) {
+        return (status || "").trim().toUpperCase() === "ENTREGUE" ? "Entregue" : "Pendente";
+    }
+
     function formatarPrazo(obrigacao) {
         if ((obrigacao.tipoPrazo || "").toUpperCase() === "ULTIMO_DIA_UTIL") {
-            const vencimento = obterProximoVencimento(obrigacao);
-            return vencimento ? `Último dia útil (${formatarData(vencimento)})` : "Último dia útil";
+            return "Último dia útil";
         }
 
         if ((obrigacao.tipoPrazo || "").toUpperCase() === "DIA_UTIL" && obrigacao.numeroDiaUtil != null) {
-            const vencimento = obterProximoVencimento(obrigacao);
-            return vencimento ? `${obrigacao.numeroDiaUtil}º dia útil (${formatarData(vencimento)})` : `${obrigacao.numeroDiaUtil}º dia útil`;
+            return `${obrigacao.numeroDiaUtil}o dia util`;
         }
 
         if (obrigacao.diaLimite != null) {
-            const vencimento = obterProximoVencimento(obrigacao);
-            return vencimento ? `Dia ${obrigacao.diaLimite} (${formatarData(vencimento)})` : `Dia ${obrigacao.diaLimite}`;
+            return `Dia ${obrigacao.diaLimite}`;
         }
 
         return "-";
@@ -319,6 +442,20 @@ document.addEventListener("DOMContentLoaded", () => {
         return `<tr><td colspan="${colspan}" class="empty-state">${escapeHtml(mensagem)}</td></tr>`;
     }
 
+    function renderResumoCelula(titulo, linhas = []) {
+        const detalhes = linhas
+            .filter((linha) => linha != null && linha !== "" && linha !== "-")
+            .map((linha) => `<span class="cell-meta">${escapeHtml(linha)}</span>`)
+            .join("");
+
+        return `
+            <div class="cell-stack">
+                <strong class="cell-title">${escapeHtml(titulo || "-")}</strong>
+                ${detalhes}
+            </div>
+        `;
+    }
+
     function preencherSelect(elemento, itens, config) {
         const valorAtual = elemento.value;
         const options = itens.map((item) => {
@@ -337,6 +474,73 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    function abrirPainel(painel) {
+        painel.open = true;
+    }
+
+    function atualizarStatusEntrega() {
+        const entregue = (entregaStatusSelect.value || "").trim().toUpperCase() === "ENTREGUE";
+        campoDataEntrega.classList.toggle("hidden", !entregue);
+        entregaDataEntregaInput.disabled = !entregue;
+        entregaDataEntregaInput.required = entregue;
+
+        if (entregue && !entregaDataEntregaInput.value) {
+            entregaDataEntregaInput.value = obterDataHojeIso();
+        }
+
+        if (!entregue) {
+            entregaDataEntregaInput.value = "";
+        }
+    }
+
+    function atualizarSelectEmpresasEntrega() {
+        preencherSelect(entregaEmpresaSelect, empresasCache, {
+            getValue: (item) => item.id,
+            getLabel: (item) => item.nome
+        });
+
+        preencherSelect(filtroEmpresaEntrega, empresasCache, {
+            getValue: (item) => item.id,
+            getLabel: (item) => item.nome,
+            includeBlank: true,
+            blankLabel: "Todas as empresas"
+        });
+    }
+
+    function atualizarSelectObrigacoesEntrega() {
+        const empresaId = Number.parseInt(entregaEmpresaSelect.value, 10);
+        const vinculosFiltrados = vinculosCache.filter((item) => item.empresaId === empresaId);
+
+        preencherSelect(entregaEmpresaObrigacaoSelect, vinculosFiltrados, {
+            getValue: (item) => item.id,
+            getLabel: (item) => item.obrigacaoNome
+        });
+
+        atualizarCamposCompetenciaEntrega();
+    }
+
+    function atualizarCamposCompetenciaEntrega() {
+        const vinculoId = Number.parseInt(entregaEmpresaObrigacaoSelect.value, 10);
+        const anual = !Number.isNaN(vinculoId) && ehEntregaAnualPorVinculoId(vinculoId);
+
+        campoEntregaCompetenciaMes.classList.toggle("hidden", anual);
+        entregaCompetenciaInput.disabled = anual;
+        entregaCompetenciaInput.required = !anual;
+
+        campoEntregaCompetenciaAno.classList.toggle("hidden", !anual);
+        entregaAnoCompetenciaInput.disabled = !anual;
+        entregaAnoCompetenciaInput.required = anual;
+
+        if (anual) {
+            entregaCompetenciaInput.value = "";
+            if (!entregaAnoCompetenciaInput.value) {
+                entregaAnoCompetenciaInput.value = new Date().getFullYear();
+            }
+        } else {
+            entregaAnoCompetenciaInput.value = "";
+        }
+    }
+
     function limparFormularioObrigacao() {
         formObrigacao.reset();
         obrigacaoIdInput.value = "";
@@ -346,6 +550,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function preencherFormularioObrigacao(obrigacao) {
+        abrirPainel(painelObrigacao);
         obrigacaoIdInput.value = obrigacao.id ?? "";
         nomeInput.value = obrigacao.nome ?? "";
         departamentoInput.value = obrigacao.departamento ?? "FISCAL";
@@ -367,6 +572,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function preencherFormularioEmpresa(empresa) {
+        abrirPainel(painelEmpresa);
         empresaIdInput.value = empresa.id ?? "";
         empresaNomeInput.value = empresa.nome ?? "";
         empresaCnpjInput.value = formatarCnpj(empresa.cnpj);
@@ -374,10 +580,45 @@ document.addEventListener("DOMContentLoaded", () => {
         cancelarEmpresaButton.classList.remove("hidden");
     }
 
+    function limparFormularioEntrega() {
+        formEntrega.reset();
+        submitEntregaButton.textContent = "Salvar controle";
+        cancelarEntregaButton.classList.add("hidden");
+        entregaStatusSelect.value = "PENDENTE";
+
+        if (empresasCache.length > 0) {
+            entregaEmpresaSelect.value = String(empresasCache[0].id);
+        }
+
+        atualizarSelectObrigacoesEntrega();
+        atualizarStatusEntrega();
+        atualizarCamposCompetenciaEntrega();
+    }
+
+    function preencherFormularioEntrega(entrega) {
+        abrirPainel(painelEntrega);
+        entregaEmpresaSelect.value = String(entrega.empresaId ?? "");
+        atualizarSelectObrigacoesEntrega();
+        entregaEmpresaObrigacaoSelect.value = String(entrega.empresaObrigacaoId ?? "");
+        atualizarCamposCompetenciaEntrega();
+
+        if (ehEntregaAnualPorVinculoId(entrega.empresaObrigacaoId)) {
+            entregaAnoCompetenciaInput.value = converterCompetenciaParaAno(entrega.competencia);
+        } else {
+            entregaCompetenciaInput.value = converterCompetenciaParaMes(entrega.competencia);
+        }
+
+        entregaStatusSelect.value = entrega.status ?? "PENDENTE";
+        entregaDataEntregaInput.value = entrega.dataEntrega ?? "";
+        submitEntregaButton.textContent = "Atualizar controle";
+        cancelarEntregaButton.classList.remove("hidden");
+        atualizarStatusEntrega();
+    }
+
     function atualizarSelectEmpresas() {
         preencherSelect(vinculoEmpresaSelect, empresasCache, {
             getValue: (item) => item.id,
-            getLabel: (item) => `${item.nome} - ${formatarCnpj(item.cnpj)}`
+            getLabel: (item) => item.nome
         });
 
         preencherSelect(filtroEmpresaVinculo, empresasCache, {
@@ -386,6 +627,9 @@ document.addEventListener("DOMContentLoaded", () => {
             includeBlank: true,
             blankLabel: "Todas as empresas"
         });
+
+        atualizarSelectEmpresasEntrega();
+        atualizarSelectObrigacoesEntrega();
     }
 
     function atualizarSelectObrigacoes() {
@@ -398,23 +642,45 @@ document.addEventListener("DOMContentLoaded", () => {
     async function carregarObrigacoes() {
         obrigacoesCache = await apiFetch("/api/obrigacoes");
         tabelaObrigacoes.innerHTML = obrigacoesCache.length === 0
-            ? renderEstadoVazio(7, "Nenhuma obrigação cadastrada.")
-            : obrigacoesCache.map((obrigacao) => `
-                <tr>
-                    <td>${escapeHtml(obrigacao.id ?? "-")}</td>
-                    <td>${escapeHtml(obrigacao.nome ?? "-")}</td>
-                    <td>${escapeHtml(formatarDepartamento(obrigacao.departamento))}</td>
-                    <td>${escapeHtml(formatarPeriodicidade(obrigacao.periodicidade))}</td>
-                    <td>${escapeHtml(formatarPrazo(obrigacao))}</td>
-                    <td>${escapeHtml(formatarMesLimite(obrigacao))}</td>
-                    <td>
-                        <div class="table-actions">
-                            <button type="button" class="table-action-btn" data-editar-obrigacao="${escapeHtml(obrigacao.id)}">Editar</button>
-                            <button type="button" class="table-action-btn danger" data-excluir-obrigacao="${escapeHtml(obrigacao.id)}">Excluir</button>
-                        </div>
-                    </td>
-                </tr>
-            `).join("");
+            ? renderEstadoVazio(4, "Nenhuma obrigação cadastrada.")
+            : obrigacoesCache.map((obrigacao) => {
+                const prazo = formatarPrazo(obrigacao);
+                const mes = formatarMesLimite(obrigacao);
+                const mensal = String(obrigacao.periodicidade || "").trim().toUpperCase() === "MENSAL";
+                const temDetalhes = (prazo && prazo !== "-") || (mes && mes !== "-");
+                const exibirMes = !mensal && mes && mes !== "-";
+
+                const toggleDetalhes = temDetalhes
+                    ? `
+                        <details class="row-details-inline">
+                            <summary class="row-details-summary" aria-label="Abrir"></summary>
+                            <div class="row-details-body">
+                                <div class="row-details-line"><strong>Prazo:</strong> ${escapeHtml(prazo || "-")}</div>
+                                ${exibirMes ? `<div class="row-details-line"><strong>Mês:</strong> ${escapeHtml(mes || "-")}</div>` : ""}
+                            </div>
+                        </details>
+                    `
+                    : "";
+
+                return `
+                    <tr>
+                        <td>
+                            <div class="cell-inline-toggle">
+                                <span class="cell-inline-toggle-text">${escapeHtml(obrigacao.nome ?? "-")}</span>
+                                ${toggleDetalhes}
+                            </div>
+                        </td>
+                        <td>${escapeHtml(formatarDepartamento(obrigacao.departamento))}</td>
+                        <td>${escapeHtml(formatarPeriodicidade(obrigacao.periodicidade))}</td>
+                        <td>
+                            <div class="table-actions">
+                                <button type="button" class="table-action-btn" data-editar-obrigacao="${escapeHtml(obrigacao.id)}">Editar</button>
+                                <button type="button" class="table-action-btn danger" data-excluir-obrigacao="${escapeHtml(obrigacao.id)}">Excluir</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join("");
         atualizarContador(contadorObrigacoes, obrigacoesCache.length);
         atualizarSelectObrigacoes();
     }
@@ -422,10 +688,9 @@ document.addEventListener("DOMContentLoaded", () => {
     async function carregarEmpresas() {
         empresasCache = await apiFetch("/api/empresas");
         tabelaEmpresas.innerHTML = empresasCache.length === 0
-            ? renderEstadoVazio(4, "Nenhuma empresa cadastrada.")
+            ? renderEstadoVazio(3, "Nenhuma empresa cadastrada.")
             : empresasCache.map((empresa) => `
                 <tr>
-                    <td>${escapeHtml(empresa.id ?? "-")}</td>
                     <td>${escapeHtml(empresa.nome ?? "-")}</td>
                     <td>${escapeHtml(formatarCnpj(empresa.cnpj))}</td>
                     <td>
@@ -443,23 +708,138 @@ document.addEventListener("DOMContentLoaded", () => {
     async function carregarVinculos() {
         const query = filtroEmpresaVinculo.value ? `?empresaId=${encodeURIComponent(filtroEmpresaVinculo.value)}` : "";
         const vinculos = await apiFetch(`/api/empresa-obrigacoes${query}`);
+        vinculosCache = await apiFetch("/api/empresa-obrigacoes");
+        atualizarSelectObrigacoesEntrega();
         tabelaVinculos.innerHTML = vinculos.length === 0
-            ? renderEstadoVazio(6, "Nenhum vínculo cadastrado.")
-            : vinculos.map((vinculo) => `
-                <tr>
-                    <td>${escapeHtml(vinculo.id ?? "-")}</td>
-                    <td>${escapeHtml(vinculo.empresaNome ?? "-")}</td>
-                    <td>${escapeHtml(formatarCnpj(vinculo.empresaCnpj))}</td>
-                    <td>${escapeHtml(vinculo.obrigacaoNome ?? "-")}</td>
-                    <td>${escapeHtml(formatarDepartamento(vinculo.departamento))}</td>
-                    <td>
-                        <div class="table-actions">
-                            <button type="button" class="table-action-btn danger" data-excluir-vinculo="${escapeHtml(vinculo.id)}">Excluir</button>
+            ? renderEstadoVazio(4, "Nenhum vínculo cadastrado.")
+            : (() => {
+                const vinculosOrdenados = [...vinculos].sort((a, b) => {
+                    const empresaA = String(a.empresaNome ?? "");
+                    const empresaB = String(b.empresaNome ?? "");
+                    const nomeCompare = empresaA.localeCompare(empresaB, "pt-BR", { sensitivity: "base" });
+                    if (nomeCompare !== 0) {
+                        return nomeCompare;
+                    }
+
+                    const idA = Number(a.empresaId ?? 0);
+                    const idB = Number(b.empresaId ?? 0);
+                    if (idA !== idB) {
+                        return idA - idB;
+                    }
+
+                    return Number(a.id ?? 0) - Number(b.id ?? 0);
+                });
+
+                const grupos = new Map();
+                for (const vinculo of vinculosOrdenados) {
+                    const empresaId = String(vinculo.empresaId ?? "");
+                    if (!grupos.has(empresaId)) {
+                        grupos.set(empresaId, []);
+                    }
+                    grupos.get(empresaId).push(vinculo);
+                }
+
+                const rows = [];
+                for (const itens of grupos.values()) {
+                    const primeiro = itens[0];
+                    const extras = itens.slice(1);
+
+                    const grupoId = String(primeiro.empresaId ?? "");
+                    const temExtras = extras.length > 0;
+                    const toggle = temExtras
+                        ? `<button type="button" class="vinculo-toggle" data-toggle-vinculos="${escapeHtml(grupoId)}" aria-label="Mostrar mais vínculos">+</button>`
+                        : "";
+
+                    const cellObrigacao = `
+                        <div class="vinculo-obrigacao-cell">
+                            <span class="vinculo-obrigacao-name">${escapeHtml(primeiro.obrigacaoNome ?? "-")}</span>
+                            ${toggle}
                         </div>
-                    </td>
-                </tr>
-            `).join("");
+                    `;
+
+                    rows.push(`
+                        <tr>
+                            <td>${escapeHtml(primeiro.empresaNome ?? "-")}</td>
+                            <td>${escapeHtml(formatarCnpj(primeiro.empresaCnpj))}</td>
+                            <td>${cellObrigacao}</td>
+                            <td>
+                                <div class="table-actions">
+                                    <button type="button" class="table-action-btn danger" data-excluir-vinculo="${escapeHtml(primeiro.id)}">Excluir</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `);
+
+                    extras.forEach((vinculo) => {
+                        rows.push(`
+                            <tr class="vinculo-child hidden" data-vinculo-grupo="${escapeHtml(grupoId)}">
+                                <td></td>
+                                <td></td>
+                                <td>${escapeHtml(vinculo.obrigacaoNome ?? "-")}</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button type="button" class="table-action-btn danger" data-excluir-vinculo="${escapeHtml(vinculo.id)}">Excluir</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                }
+
+                return rows.join("");
+            })();
         atualizarContador(contadorVinculos, vinculos.length);
+    }
+
+    async function carregarEntregas() {
+        const params = new URLSearchParams();
+
+        if (filtroEmpresaEntrega.value) {
+            params.set("empresaId", filtroEmpresaEntrega.value);
+        }
+
+        const competencia = converterMesParaCompetencia(filtroCompetenciaEntrega.value);
+        if (competencia) {
+            params.set("competencia", competencia);
+        }
+
+        if (filtroDepartamentoEntrega.value) {
+            params.set("departamento", filtroDepartamentoEntrega.value);
+        }
+
+        if (filtroStatusEntrega.value) {
+            params.set("status", filtroStatusEntrega.value);
+        }
+
+        const query = params.toString() ? `?${params.toString()}` : "";
+        entregasCache = await apiFetch(`/api/controles-entrega${query}`);
+
+        tabelaEntregas.innerHTML = entregasCache.length === 0
+            ? renderEstadoVazio(8, "Nenhum controle de entrega cadastrado.")
+            : entregasCache.map((entrega) => {
+                const entregue = (entrega.status || "").toUpperCase() === "ENTREGUE";
+                const rowClass = entregue ? "row-delivered" : "";
+                const chipClass = entregue ? "is-delivered" : "is-pending";
+
+                return `
+                    <tr class="${rowClass}">
+                        <td>${escapeHtml(entrega.empresaNome ?? "-")}</td>
+                        <td>${escapeHtml(formatarCnpj(entrega.empresaCnpj))}</td>
+                        <td>${escapeHtml(entrega.obrigacaoNome ?? "-")}</td>
+                        <td>${escapeHtml(formatarDepartamento(entrega.departamento))}</td>
+                        <td>${escapeHtml(formatarCompetenciaEntrega(entrega))}</td>
+                        <td><span class="status-chip ${chipClass}">${escapeHtml(formatarStatusEntrega(entrega.status))}</span></td>
+                        <td>${escapeHtml(formatarDataIso(entrega.dataEntrega))}</td>
+                        <td>
+                            <div class="table-actions">
+                                <button type="button" class="table-action-btn" data-editar-entrega="${escapeHtml(entrega.id)}">Editar</button>
+                                <button type="button" class="table-action-btn danger" data-excluir-entrega="${escapeHtml(entrega.id)}">Excluir</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join("");
+        atualizarContador(contadorEntregas, entregasCache.length);
     }
 
     formObrigacao.addEventListener("submit", async (event) => {
@@ -500,6 +880,7 @@ document.addEventListener("DOMContentLoaded", () => {
             limparFormularioObrigacao();
             await carregarObrigacoes();
             await carregarVinculos();
+            await carregarEntregas();
         } catch (error) {
             alert(error.message);
         }
@@ -525,6 +906,7 @@ document.addEventListener("DOMContentLoaded", () => {
             limparFormularioEmpresa();
             await carregarEmpresas();
             await carregarVinculos();
+            await carregarEntregas();
         } catch (error) {
             alert(error.message);
         }
@@ -543,6 +925,37 @@ document.addEventListener("DOMContentLoaded", () => {
                 })
             });
             await carregarVinculos();
+            await carregarEntregas();
+            limparFormularioEntrega();
+        } catch (error) {
+            alert(error.message);
+        }
+    });
+
+    formEntrega.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const vinculoId = Number.parseInt(entregaEmpresaObrigacaoSelect.value, 10);
+        const competencia = ehEntregaAnualPorVinculoId(vinculoId)
+            ? converterAnoParaCompetencia(entregaAnoCompetenciaInput.value)
+            : converterMesParaCompetencia(entregaCompetenciaInput.value);
+        if (!competencia) {
+            return;
+        }
+
+        try {
+            await apiFetch("/api/controles-entrega", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    empresaObrigacaoId: Number.parseInt(entregaEmpresaObrigacaoSelect.value, 10),
+                    competencia,
+                    status: entregaStatusSelect.value,
+                    dataEntrega: entregaDataEntregaInput.disabled ? null : (entregaDataEntregaInput.value || null)
+                })
+            });
+            limparFormularioEntrega();
+            await carregarEntregas();
         } catch (error) {
             alert(error.message);
         }
@@ -550,13 +963,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
     periodicidadeInput.addEventListener("change", atualizarMesLimite);
     tipoPrazoInput.addEventListener("change", atualizarTipoPrazo);
+    entregaEmpresaSelect.addEventListener("change", atualizarSelectObrigacoesEntrega);
+    entregaEmpresaObrigacaoSelect.addEventListener("change", atualizarCamposCompetenciaEntrega);
+    entregaStatusSelect.addEventListener("change", atualizarStatusEntrega);
     empresaCnpjInput.addEventListener("input", () => {
         empresaCnpjInput.value = formatarCnpjParcial(empresaCnpjInput.value);
     });
     cancelarObrigacaoButton.addEventListener("click", limparFormularioObrigacao);
     cancelarEmpresaButton.addEventListener("click", limparFormularioEmpresa);
+    cancelarEntregaButton.addEventListener("click", limparFormularioEntrega);
     filtroEmpresaVinculo.addEventListener("change", () => {
         carregarVinculos().catch((error) => alert(error.message));
+    });
+    aplicarFiltrosEntregaButton.addEventListener("click", () => {
+        carregarEntregas().catch((error) => alert(error.message));
+    });
+    limparFiltrosEntregaButton.addEventListener("click", () => {
+        filtroEmpresaEntrega.value = "";
+        filtroCompetenciaEntrega.value = "";
+        filtroDepartamentoEntrega.value = "";
+        filtroStatusEntrega.value = "";
+        carregarEntregas().catch((error) => alert(error.message));
     });
 
     tabelaObrigacoes.addEventListener("click", async (event) => {
@@ -590,6 +1017,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             await carregarObrigacoes();
             await carregarVinculos();
+            await carregarEntregas();
         } catch (error) {
             alert(error.message);
         }
@@ -626,13 +1054,30 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             await carregarEmpresas();
             await carregarVinculos();
+            await carregarEntregas();
         } catch (error) {
             alert(error.message);
         }
     });
 
     tabelaVinculos.addEventListener("click", async (event) => {
+        const toggleButton = event.target.closest("[data-toggle-vinculos]");
         const excluirButton = event.target.closest("[data-excluir-vinculo]");
+
+        if (toggleButton) {
+            const grupo = toggleButton.dataset.toggleVinculos;
+            if (!grupo) {
+                return;
+            }
+
+            const linhas = tabelaVinculos.querySelectorAll(`[data-vinculo-grupo="${CSS.escape(grupo)}"]`);
+            const algumaAberta = Array.from(linhas).some((linha) => !linha.classList.contains("hidden"));
+            linhas.forEach((linha) => linha.classList.toggle("hidden", algumaAberta));
+            toggleButton.textContent = algumaAberta ? "+" : "−";
+            toggleButton.setAttribute("aria-label", algumaAberta ? "Mostrar mais vínculos" : "Ocultar vínculos");
+            return;
+        }
+
         if (!excluirButton) {
             return;
         }
@@ -645,6 +1090,40 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             await apiFetch(`/api/empresa-obrigacoes/${id}`, { method: "DELETE" });
             await carregarVinculos();
+            await carregarEntregas();
+            limparFormularioEntrega();
+        } catch (error) {
+            alert(error.message);
+        }
+    });
+
+    tabelaEntregas.addEventListener("click", async (event) => {
+        const editarButton = event.target.closest("[data-editar-entrega]");
+        const excluirButton = event.target.closest("[data-excluir-entrega]");
+
+        if (editarButton) {
+            const id = Number.parseInt(editarButton.dataset.editarEntrega, 10);
+            const entrega = entregasCache.find((item) => item.id === id);
+            if (entrega) {
+                preencherFormularioEntrega(entrega);
+                formEntrega.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+            return;
+        }
+
+        if (!excluirButton) {
+            return;
+        }
+
+        const id = Number.parseInt(excluirButton.dataset.excluirEntrega, 10);
+        if (!window.confirm("Deseja realmente excluir este controle de entrega?")) {
+            return;
+        }
+
+        try {
+            await apiFetch(`/api/controles-entrega/${id}`, { method: "DELETE" });
+            await carregarEntregas();
+            limparFormularioEntrega();
         } catch (error) {
             alert(error.message);
         }
@@ -652,13 +1131,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
     limparFormularioObrigacao();
     limparFormularioEmpresa();
+    limparFormularioEntrega();
 
     Promise.all([
         carregarObrigacoes(),
         carregarEmpresas()
     ])
-        .then(() => carregarVinculos())
+        .then(async () => {
+            await carregarVinculos();
+            await carregarEntregas();
+        })
         .catch((error) => {
             alert(error.message);
         });
 });
+
