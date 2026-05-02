@@ -56,6 +56,25 @@
         return;
     }
 
+    function atualizarTextoDetalhes(detailsElement) {
+        if (!detailsElement) {
+            return;
+        }
+
+        const meta = detailsElement.querySelector(".details-meta");
+        if (!meta) {
+            return;
+        }
+
+        meta.textContent = detailsElement.open ? "Clique para recolher" : "Clique para expandir";
+    }
+
+    const paineisDetalhes = Array.from(document.querySelectorAll("details.details-panel"));
+    paineisDetalhes.forEach((painel) => {
+        atualizarTextoDetalhes(painel);
+        painel.addEventListener("toggle", () => atualizarTextoDetalhes(painel));
+    });
+
     let obrigacoesCache = [];
     let empresasCache = [];
     let vinculosCache = [];
@@ -479,7 +498,7 @@
         }
 
         if ((obrigacao.tipoPrazo || "").toUpperCase() === "DIA_UTIL" && obrigacao.numeroDiaUtil != null) {
-            return `${obrigacao.numeroDiaUtil}o dia util`;
+            return `${obrigacao.numeroDiaUtil}º dia útil`;
         }
 
         if (obrigacao.diaLimite != null) {
