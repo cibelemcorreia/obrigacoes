@@ -42,6 +42,8 @@ public class ControleEntrega {
 
     private LocalDate dataEntrega;
 
+    private LocalDate dataVencimento;
+
     public Long getId() {
         return id;
     }
@@ -80,5 +82,13 @@ public class ControleEntrega {
 
     public void setDataEntrega(LocalDate dataEntrega) {
         this.dataEntrega = dataEntrega;
+    }
+
+    public LocalDate getDataVencimento() {
+        return dataVencimento;
+    }
+
+    public void setDataVencimento(LocalDate dataVencimento) {
+        this.dataVencimento = dataVencimento;
     }
 }

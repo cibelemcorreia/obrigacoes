@@ -4,6 +4,7 @@ import br.com.contabilidade.obrigacoes.dto.ControleEntregaRequest;
 import br.com.contabilidade.obrigacoes.dto.ControleEntregaResponse;
 import br.com.contabilidade.obrigacoes.entity.ControleEntrega;
 import br.com.contabilidade.obrigacoes.entity.EmpresaObrigacao;
+import br.com.contabilidade.obrigacoes.entity.ObrigacaoAcessoria;
 import br.com.contabilidade.obrigacoes.entity.Periodicidade;
 import br.com.contabilidade.obrigacoes.entity.StatusEntrega;
 import br.com.contabilidade.obrigacoes.exception.NotFoundException;
@@ -62,6 +63,7 @@ public class ControleEntregaService {
         controle.setCompetencia(competencia);
         controle.setStatus(request.status());
         controle.setDataEntrega(normalizarDataEntrega(request.status(), request.dataEntrega()));
+        controle.setDataVencimento(calcularDataVencimento(empresaObrigacao.getObrigacao(), competencia));
 
         validarDatas(controle);
         ControleEntrega salvo = repository.save(controle);
@@ -128,6 +130,7 @@ public class ControleEntregaService {
         proximoControle.setCompetencia(proximaCompetencia);
         proximoControle.setStatus(StatusEntrega.PENDENTE);
         proximoControle.setDataEntrega(null);
+        proximoControle.setDataVencimento(calcularDataVencimento(empresaObrigacao.getObrigacao(), proximaCompetencia));
         repository.save(proximoControle);
     }
 
@@ -153,7 +156,21 @@ public class ControleEntregaService {
                 empresaObrigacao.getObrigacao().getDepartamento(),
                 controle.getCompetencia(),
                 controle.getStatus(),
-                controle.getDataEntrega()
+                controle.getDataEntrega(),
+                normalizarDataVencimento(controle)
         );
+    }
+
+    private LocalDate calcularDataVencimento(ObrigacaoAcessoria obrigacao, LocalDate competencia) {
+        return PrazoEntregaCalculator.calcularVencimento(obrigacao, competencia);
+    }
+
+    private LocalDate normalizarDataVencimento(ControleEntrega controle) {
+        if (controle.getDataVencimento() != null) {
+            return controle.getDataVencimento();
+        }
+
+        EmpresaObrigacao empresaObrigacao = controle.getEmpresaObrigacao();
+        return empresaObrigacao == null ? null : calcularDataVencimento(empresaObrigacao.getObrigacao(), controle.getCompetencia());
     }
 }

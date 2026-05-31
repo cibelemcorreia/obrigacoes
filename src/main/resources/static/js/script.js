@@ -156,6 +156,14 @@
         elemento.textContent = `${total} ${sufixo}`;
     }
 
+    function formatarNumero(valor) {
+        const numero = Number(valor);
+        if (Number.isNaN(numero)) {
+            return "0";
+        }
+        return new Intl.NumberFormat("pt-BR").format(numero);
+    }
+
     function obterDataHojeIso() {
         return new Date().toISOString().slice(0, 10);
     }
@@ -786,6 +794,8 @@
     }
 
     async function carregarEntregas() {
+        await carregarIndicadoresEntregas();
+
         const params = new URLSearchParams();
 
         if (filtroEmpresaEntrega.value) {
@@ -836,6 +846,46 @@
                 `;
             }).join("");
         atualizarContador(contadorEntregas, entregasCache.length);
+    }
+
+    async function carregarIndicadoresEntregas() {
+        const kpiTotal = document.getElementById("kpi-total");
+        const kpiPendentes = document.getElementById("kpi-pendentes");
+        const kpiEntregues = document.getElementById("kpi-entregues");
+        const kpiVencidas = document.getElementById("kpi-vencidas");
+        const kpiProximas = document.getElementById("kpi-proximas");
+        const kpiJanela = document.getElementById("kpi-janela");
+
+        if (!kpiTotal || !kpiPendentes || !kpiEntregues || !kpiVencidas || !kpiProximas || !kpiJanela) {
+            return;
+        }
+
+        const params = new URLSearchParams();
+
+        if (filtroEmpresaEntrega.value) {
+            params.set("empresaId", filtroEmpresaEntrega.value);
+        }
+
+        const competencia = converterMesParaCompetencia(filtroCompetenciaEntrega.value);
+        if (competencia) {
+            params.set("competencia", competencia);
+        }
+
+        if (filtroDepartamentoEntrega.value) {
+            params.set("departamento", filtroDepartamentoEntrega.value);
+        }
+
+        const query = params.toString() ? `?${params.toString()}` : "";
+        const indicadores = await apiFetch(`/api/indicadores/entregas${query}`);
+
+        kpiTotal.textContent = formatarNumero(indicadores.total);
+        kpiPendentes.textContent = formatarNumero(indicadores.pendentes);
+        kpiEntregues.textContent = formatarNumero(indicadores.entregues);
+        kpiVencidas.textContent = formatarNumero(indicadores.vencidas);
+        kpiProximas.textContent = formatarNumero(indicadores.proximasDoVencimento);
+
+        const dias = Number(indicadores.diasProximos);
+        kpiJanela.textContent = Number.isNaN(dias) ? "" : `Janela: hoje + ${dias} dias`;
     }
 
     formObrigacao.addEventListener("submit", async (event) => {

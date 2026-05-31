@@ -431,6 +431,75 @@ button.secondary:hover {
     margin-bottom: 14px;
 }
 
+.section-title-inline {
+    align-items: flex-start;
+}
+
+.section-subtitle {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px;
+}
+
+.kpi-card {
+    border: 1px solid rgba(22, 62, 105, 0.12);
+    background: rgba(255, 255, 255, 0.88);
+    border-radius: 18px;
+    padding: 14px 16px;
+    box-shadow: 0 12px 26px rgba(15, 37, 73, 0.06);
+    overflow: hidden;
+    position: relative;
+}
+
+.kpi-card::after {
+    content: "";
+    position: absolute;
+    inset: auto -40px -60px auto;
+    width: 140px;
+    height: 140px;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(31, 79, 122, 0.14), rgba(31, 79, 122, 0));
+    pointer-events: none;
+}
+
+.kpi-label {
+    margin: 0;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+}
+
+.kpi-value {
+    margin: 8px 0 0;
+    font-weight: 800;
+    color: var(--title);
+    font-size: 1.7rem;
+    letter-spacing: -0.02em;
+}
+
+.kpi-hint {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.kpi-card-danger {
+    border-color: rgba(180, 52, 52, 0.22);
+}
+
+.kpi-card-warning {
+    border-color: rgba(188, 129, 46, 0.24);
+}
+
 .counter {
     display: inline-flex;
     align-items: center;

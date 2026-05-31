@@ -15,6 +15,7 @@ public record ControleEntregaResponse(
         String departamento,
         LocalDate competencia,
         StatusEntrega status,
-        LocalDate dataEntrega
+        LocalDate dataEntrega,
+        LocalDate dataVencimento
 ) {
 }

@@ -66,11 +66,13 @@ public class EmpresaObrigacaoService {
         ControleEntrega controleEntrega = new ControleEntrega();
         controleEntrega.setEmpresaObrigacao(vinculoSalvo);
         LocalDate hoje = LocalDate.now();
-        controleEntrega.setCompetencia(obrigacao.getPeriodicidade() == Periodicidade.ANUAL
+        LocalDate competencia = obrigacao.getPeriodicidade() == Periodicidade.ANUAL
                 ? hoje.minusYears(1).withDayOfYear(1)
-                : hoje.minusMonths(1).withDayOfMonth(1));
+                : hoje.minusMonths(1).withDayOfMonth(1);
+        controleEntrega.setCompetencia(competencia);
         controleEntrega.setStatus(StatusEntrega.PENDENTE);
         controleEntrega.setDataEntrega(null);
+        controleEntrega.setDataVencimento(PrazoEntregaCalculator.calcularVencimento(obrigacao, competencia));
         controleEntregaRepository.save(controleEntrega);
 
         return toResponse(vinculoSalvo);

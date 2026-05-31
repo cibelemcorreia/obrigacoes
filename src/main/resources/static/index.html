@@ -263,6 +263,39 @@
 
                 <section class="workspace-section">
                     <div class="board-grid board-grid-single">
+                        <section class="card card-panel kpi-card-shell" aria-label="Indicadores de entregas">
+                            <div class="section-title section-title-inline">
+                                <div>
+                                    <h2>Indicadores</h2>
+                                    <p class="section-subtitle">Resumo com base nos filtros aplicados.</p>
+                                </div>
+                            </div>
+
+                            <div class="kpi-grid" id="kpi-entregas">
+                                <div class="kpi-card">
+                                    <p class="kpi-label">Total</p>
+                                    <p class="kpi-value" id="kpi-total">—</p>
+                                </div>
+                                <div class="kpi-card">
+                                    <p class="kpi-label">Pendentes</p>
+                                    <p class="kpi-value" id="kpi-pendentes">—</p>
+                                </div>
+                                <div class="kpi-card">
+                                    <p class="kpi-label">Entregues</p>
+                                    <p class="kpi-value" id="kpi-entregues">—</p>
+                                </div>
+                                <div class="kpi-card kpi-card-danger">
+                                    <p class="kpi-label">Vencidas</p>
+                                    <p class="kpi-value" id="kpi-vencidas">—</p>
+                                </div>
+                                <div class="kpi-card kpi-card-warning">
+                                    <p class="kpi-label">Próximas do vencimento</p>
+                                    <p class="kpi-value" id="kpi-proximas">—</p>
+                                    <p class="kpi-hint" id="kpi-janela">—</p>
+                                </div>
+                            </div>
+                        </section>
+
                         <section class="card card-panel table-card filters-card">
                     <div class="section-title">
                         <div>
