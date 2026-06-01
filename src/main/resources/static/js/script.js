@@ -69,10 +69,45 @@
         meta.textContent = detailsElement.open ? "Clique para recolher" : "Clique para expandir";
     }
 
+    const DETAILS_PANEL_STATE_PREFIX = "obrigacoes.detailsPanel.open.";
+
+    function obterStorageKeyPainel(detailsElement) {
+        const id = String(detailsElement?.id ?? "").trim();
+        if (!id) {
+            return null;
+        }
+        return `${DETAILS_PANEL_STATE_PREFIX}${id}`;
+    }
+
     const paineisDetalhes = Array.from(document.querySelectorAll("details.details-panel"));
     paineisDetalhes.forEach((painel) => {
+        try {
+            const storageKey = obterStorageKeyPainel(painel);
+            if (storageKey) {
+                const valor = window.localStorage.getItem(storageKey);
+                if (valor === "1") {
+                    painel.open = true;
+                } else if (valor === "0") {
+                    painel.open = false;
+                }
+            }
+        } catch {
+            // ignore
+        }
+
         atualizarTextoDetalhes(painel);
-        painel.addEventListener("toggle", () => atualizarTextoDetalhes(painel));
+        painel.addEventListener("toggle", () => {
+            atualizarTextoDetalhes(painel);
+
+            try {
+                const storageKey = obterStorageKeyPainel(painel);
+                if (storageKey) {
+                    window.localStorage.setItem(storageKey, painel.open ? "1" : "0");
+                }
+            } catch {
+                // ignore
+            }
+        });
     });
 
     let obrigacoesCache = [];
