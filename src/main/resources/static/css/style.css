@@ -496,8 +496,93 @@ button.secondary:hover {
     border-color: rgba(180, 52, 52, 0.22);
 }
 
+.kpi-card-danger.has-alert {
+    border-color: rgba(185, 28, 28, 0.68);
+    background: linear-gradient(145deg, #fff7f7, #fbd5d8);
+    box-shadow: 0 14px 30px rgba(153, 27, 27, 0.2);
+}
+
+.kpi-card-danger.has-alert .kpi-label,
+.kpi-card-danger.has-alert .kpi-value {
+    color: #991b1b;
+}
+
+.overdue-alert-icon {
+    display: none;
+    width: 18px;
+    height: 18px;
+    margin-left: 4px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: #b91c1c;
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 800;
+    line-height: 1;
+    box-shadow: 0 3px 8px rgba(153, 27, 27, 0.34);
+}
+
+.kpi-card-danger.has-alert .overdue-alert-icon {
+    display: inline-flex;
+}
+
+.kpi-card-pending.has-items {
+    border-color: rgba(202, 138, 4, 0.36);
+    background: linear-gradient(145deg, #fffef7, #fef3c7);
+    box-shadow: 0 14px 30px rgba(161, 98, 7, 0.1);
+}
+
+.kpi-card-pending.has-items .kpi-label,
+.kpi-card-pending.has-items .kpi-value {
+    color: #a16207;
+}
+
+.kpi-card-success.has-items {
+    border-color: rgba(16, 131, 95, 0.42);
+    background: linear-gradient(145deg, #f7fffb, #e3f6ed);
+    box-shadow: 0 14px 30px rgba(15, 115, 85, 0.12);
+}
+
+.kpi-card-success.has-items .kpi-label,
+.kpi-card-success.has-items .kpi-value {
+    color: #0f7355;
+}
+
 .kpi-card-warning {
     border-color: rgba(188, 129, 46, 0.24);
+}
+
+.kpi-card-warning.has-items {
+    border-color: rgba(234, 88, 12, 0.46);
+    background: linear-gradient(145deg, #fffaf5, #ffe4c7);
+    box-shadow: 0 14px 30px rgba(194, 65, 12, 0.13);
+}
+
+.kpi-card-warning.has-items .kpi-label,
+.kpi-card-warning.has-items .kpi-value,
+.kpi-card-warning.has-items .kpi-hint {
+    color: #9a3412;
+}
+
+.due-alert-icon {
+    display: none;
+    margin-left: 4px;
+    width: 18px;
+    height: 18px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: #ea580c;
+    color: #ffffff;
+    font-size: 0.76rem;
+    font-weight: 800;
+    line-height: 1;
+    box-shadow: 0 3px 8px rgba(154, 52, 18, 0.28);
+}
+
+.kpi-card-warning.has-items .due-alert-icon {
+    display: inline-flex;
 }
 
 .counter {
@@ -706,6 +791,14 @@ th:last-child {
     color: #0f7355;
 }
 
+.delivery-status {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+    align-items: center;
+    white-space: nowrap;
+}
+
 .due-cell {
     display: grid;
     gap: 6px;
@@ -722,13 +815,30 @@ th:last-child {
 }
 
 .due-badge.near {
-    background: rgba(191, 126, 16, 0.14);
-    color: #8f5d09;
+    background: #ea580c;
+    color: #ffffff;
+    min-width: 22px;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    justify-content: center;
+    font-size: 0.78rem;
+    font-weight: 800;
+    box-shadow: 0 3px 8px rgba(154, 52, 18, 0.24);
 }
 
 .due-badge.overdue {
-    background: rgba(182, 55, 67, 0.14);
-    color: #9a2430;
+    min-width: 22px;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    justify-content: center;
+    background: #b91c1c;
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1;
+    box-shadow: 0 3px 8px rgba(153, 27, 27, 0.32);
 }
 
 .field-emphasis input {
@@ -1474,7 +1584,7 @@ th {
 
 .table-entregas th:nth-child(1),
 .table-entregas td:nth-child(1) {
-    width: 24%;
+    width: 20%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1488,15 +1598,46 @@ th {
     text-overflow: ellipsis;
 }
 
+.table-entregas th:nth-child(3),
+.table-entregas td:nth-child(3) {
+    width: 11%;
+}
+
+.table-entregas th:nth-child(4),
+.table-entregas td:nth-child(4) {
+    width: 10%;
+    white-space: nowrap;
+}
+
+.table-entregas th:nth-child(5),
+.table-entregas td:nth-child(5) {
+    width: 9%;
+    white-space: nowrap;
+}
+
+.table-entregas th:nth-child(6),
+.table-entregas td:nth-child(6) {
+    width: 10%;
+    white-space: nowrap;
+}
+
 .table-entregas th:nth-child(7),
 .table-entregas td:nth-child(7) {
-    width: 14%;
+    width: 10%;
     white-space: nowrap;
 }
 
 .table-entregas th:last-child,
 .table-entregas td:last-child {
     width: 14%;
+}
+
+.table-entregas th:nth-child(4) {
+    padding-right: 18px;
+}
+
+.table-entregas th:nth-child(5) {
+    padding-left: 18px;
 }
 
 .table-entregas .table-actions {
@@ -1528,6 +1669,44 @@ tbody tr:nth-child(even) {
 
 tbody tr:hover {
     background: #edf4fb;
+}
+
+tbody tr.row-pending,
+tbody tr.row-pending:nth-child(even) {
+    background: #fff8dc;
+}
+
+tbody tr.row-pending:hover {
+    background: #fef0b8;
+}
+
+tbody tr.row-overdue,
+tbody tr.row-overdue:nth-child(even) {
+    background: #f8cfd3;
+    box-shadow: inset 6px 0 0 #b91c1c;
+}
+
+tbody tr.row-overdue:hover {
+    background: #f2b8be;
+}
+
+tbody tr.row-near-due,
+tbody tr.row-near-due:nth-child(even) {
+    background: #ffead7;
+    box-shadow: inset 4px 0 0 #f27a32;
+}
+
+tbody tr.row-near-due:hover {
+    background: #ffddbd;
+}
+
+tbody tr.row-delivered,
+tbody tr.row-delivered:nth-child(even) {
+    background: #edf9f3;
+}
+
+tbody tr.row-delivered:hover {
+    background: #dcf3e8;
 }
 
 .empty-state {

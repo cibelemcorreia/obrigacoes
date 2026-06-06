@@ -14,6 +14,7 @@ import br.com.contabilidade.obrigacoes.repository.EmpresaObrigacaoRepository;
 import br.com.contabilidade.obrigacoes.repository.EmpresaRepository;
 import br.com.contabilidade.obrigacoes.repository.ObrigacaoAcessoriaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -78,6 +79,7 @@ public class EmpresaObrigacaoService {
         return toResponse(vinculoSalvo);
     }
 
+    @Transactional
     public void excluir(Long id) {
         if (!repository.existsById(id)) {
             throw new NotFoundException("Vínculo não encontrado para o id informado");

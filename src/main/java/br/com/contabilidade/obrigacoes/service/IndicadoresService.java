@@ -24,7 +24,7 @@ public class IndicadoresService {
                                                           Integer diasProximos) {
         LocalDate competenciaNormalizada = competencia == null ? null : competencia.withDayOfMonth(1);
         String departamentoNormalizado = normalizarDepartamento(departamento);
-        int dias = diasProximos == null ? 7 : Math.max(0, diasProximos);
+        int dias = diasProximos == null ? 10 : Math.max(0, diasProximos);
 
         LocalDate hoje = LocalDate.now();
         LocalDate limiteProximos = hoje.plusDays(dias);

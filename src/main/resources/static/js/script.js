@@ -114,6 +114,7 @@
     let empresasCache = [];
     let vinculosCache = [];
     let entregasCache = [];
+    let diasProximosVencimento = 10;
 
     const appTopbar = document.querySelector(".app-topbar");
     const menuToggleButton = document.getElementById("btn-menu");
@@ -200,7 +201,11 @@
     }
 
     function obterDataHojeIso() {
-        return new Date().toISOString().slice(0, 10);
+        const hoje = new Date();
+        const ano = hoje.getFullYear();
+        const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+        const dia = String(hoje.getDate()).padStart(2, "0");
+        return `${ano}-${mes}-${dia}`;
     }
 
     function formatarDataIsoParaBr(valor) {
@@ -535,6 +540,31 @@
         return (status || "").trim().toUpperCase() === "ENTREGUE" ? "Entregue" : "Pendente";
     }
 
+    function entregaEstaVencida(entrega) {
+        if ((entrega.status || "").trim().toUpperCase() === "ENTREGUE" || !entrega.dataVencimento) {
+            return false;
+        }
+
+        return entrega.dataVencimento < obterDataHojeIso();
+    }
+
+    function entregaEstaProximaDoVencimento(entrega) {
+        if ((entrega.status || "").trim().toUpperCase() === "ENTREGUE" || !entrega.dataVencimento) {
+            return false;
+        }
+
+        const hojeIso = obterDataHojeIso();
+        const limite = new Date(`${hojeIso}T00:00:00`);
+        limite.setDate(limite.getDate() + diasProximosVencimento);
+
+        const ano = limite.getFullYear();
+        const mes = String(limite.getMonth() + 1).padStart(2, "0");
+        const dia = String(limite.getDate()).padStart(2, "0");
+        const limiteIso = `${ano}-${mes}-${dia}`;
+
+        return entrega.dataVencimento >= hojeIso && entrega.dataVencimento <= limiteIso;
+    }
+
     function formatarPrazo(obrigacao) {
         if ((obrigacao.tipoPrazo || "").toUpperCase() === "ULTIMO_DIA_UTIL") {
             return "Último dia útil";
@@ -857,8 +887,23 @@
             ? renderEstadoVazio(8, "Nenhum controle de entrega cadastrado.")
             : entregasCache.map((entrega) => {
                 const entregue = (entrega.status || "").toUpperCase() === "ENTREGUE";
-                const rowClass = entregue ? "row-delivered" : "";
+                const vencida = entregaEstaVencida(entrega);
+                const proximaDoVencimento = entregaEstaProximaDoVencimento(entrega);
+                const rowClass = entregue
+                    ? "row-delivered"
+                    : vencida
+                        ? "row-overdue"
+                        : proximaDoVencimento
+                            ? "row-near-due"
+                            : "row-pending";
                 const chipClass = entregue ? "is-delivered" : "is-pending";
+                const statusTexto = formatarStatusEntrega(entrega.status);
+                const marcadorVencida = vencida
+                    ? `<span class="due-badge overdue" title="Prazo vencido" aria-label="Prazo vencido">×</span>`
+                    : "";
+                const marcadorProxima = proximaDoVencimento
+                    ? `<span class="due-badge near" title="Próxima do vencimento" aria-label="Próxima do vencimento">!</span>`
+                    : "";
                 const actions = entregue
                     ? `<button type="button" class="table-action-btn secondary" data-desfazer-entrega="${escapeHtml(entrega.id)}">Desfazer entrega</button>`
                     : `<button type="button" class="table-action-btn" data-marcar-entregue="${escapeHtml(entrega.id)}">Marcar entregue</button>`;
@@ -870,7 +915,13 @@
                         <td>${escapeHtml(entrega.obrigacaoNome ?? "-")}</td>
                         <td>${escapeHtml(formatarDepartamento(entrega.departamento))}</td>
                         <td>${escapeHtml(formatarCompetenciaEntrega(entrega))}</td>
-                        <td><span class="status-chip ${chipClass}">${escapeHtml(formatarStatusEntrega(entrega.status))}</span></td>
+                        <td>
+                            <div class="delivery-status">
+                                <span class="status-chip ${chipClass}">${escapeHtml(statusTexto)}</span>
+                                ${marcadorVencida}
+                                ${marcadorProxima}
+                            </div>
+                        </td>
                         <td>${escapeHtml(formatarDataIso(entrega.dataEntrega))}</td>
                         <td>
                             <div class="table-actions">
@@ -919,7 +970,19 @@
         kpiVencidas.textContent = formatarNumero(indicadores.vencidas);
         kpiProximas.textContent = formatarNumero(indicadores.proximasDoVencimento);
 
+        const cardPendentes = kpiPendentes.closest(".kpi-card");
+        const cardEntregues = kpiEntregues.closest(".kpi-card");
+        const cardVencidas = kpiVencidas.closest(".kpi-card");
+        const cardProximas = kpiProximas.closest(".kpi-card");
+        cardPendentes?.classList.toggle("has-items", Number(indicadores.pendentes) > 0);
+        cardEntregues?.classList.toggle("has-items", Number(indicadores.entregues) > 0);
+        cardVencidas?.classList.toggle("has-alert", Number(indicadores.vencidas) > 0);
+        cardProximas?.classList.toggle("has-items", Number(indicadores.proximasDoVencimento) > 0);
+
         const dias = Number(indicadores.diasProximos);
+        if (!Number.isNaN(dias)) {
+            diasProximosVencimento = dias;
+        }
         kpiJanela.textContent = Number.isNaN(dias) ? "" : `Janela: hoje + ${dias} dias`;
     }
 
